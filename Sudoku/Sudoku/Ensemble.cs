@@ -21,20 +21,21 @@ namespace Sudoku
         public void Add(Cell cell)
         {
             List<Cell> tempCel = this.cellsList.FindAll(c => c.hypothesis.Contains(cell.values));
-            tempCel.ForEach(c => c.hypothesis.Remove(cell.values));
+            if(tempCel.Count != 0)
+                
+                tempCel.ForEach(c => c.hypothesis.Remove(cell.values));
             this.cellsList.Add(cell);
         }
 
-        public static Ensemble operator +(Ensemble c1, Cell c2)
+        public static Ensemble operator +(Ensemble s1, Cell c2)
         {
-            c1.Add(c2);
-            return c1;
+            s1.Add(c2);
+            return s1;
         }
 
-        public static Ensemble operator +(Cell c2 , Ensemble c1)
+        public static Ensemble operator +(Cell c2 , Ensemble s1)
         {
-            c1.Add(c2);
-            return c1;
+            return s1 + c2 ;
         }
 
 
