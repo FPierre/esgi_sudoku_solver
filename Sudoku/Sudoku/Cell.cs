@@ -37,23 +37,20 @@ namespace Sudoku
 		protected internal List<String> hypothesis;
         protected internal String value;
 
-		public Cell (Ensemble listColumn , Ensemble listLine , Ensemble listSector,String values,List<String> hypothesis)
+		public Cell (Ensemble listColumn , Ensemble listLine , Ensemble listSector,String value,List<String> hypothesis)
 		{
 			this.listColumn = listColumn;
 			this.listLine = listLine;
 			this.listSector = listSector;
-			this.value = values;
+			this.value = value;
 			this.hypothesis = hypothesis;
 		}
 
-		public Cell (String values,List<String> hypothesis)
+		public Cell (String value,List<String> hypothesis)
 		{
-            this.value = values;
+            this.value = value;
             this.hypothesis = hypothesis;
 		}
-
-
-       
 
 		public bool ExistsInEnsemble(params Ensemble[] t)
 		{
@@ -73,7 +70,22 @@ namespace Sudoku
             {
                 monEnsemble.Add(this);
             }
+            this.calculateNewHipothesis();
         }
+
+/*
+        public void calculateNewHipothesis()
+        {
+            List<Ensemble> tempList = new List<Ensemble>();
+            tempList.Add(this.listColumn);
+            tempList.Add(this.listLine);
+            tempList.Add(this.listSector);
+            tempList.Select(monEnsemble => monEnsemble.cellsList.FindAll(
+                                            myCell =>  this.hypothesis.Exists(
+                                                oldHypothesis => myCell.value.Equals(oldHypothesis))));
+       }
+ * 
+ */
 
         public bool ValuesIsNull()
         {
