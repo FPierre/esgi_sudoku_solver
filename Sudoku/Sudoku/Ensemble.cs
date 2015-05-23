@@ -20,11 +20,15 @@ namespace Sudoku
 
         public void Add(Cell cell)
         {
-            List<Cell> tempCel = this.cellsList.FindAll(c => c.hypothesis.Contains(cell.values));
+            List<Cell> tempCel = this.cellsList.FindAll(c => c.hypothesis.Contains(cell.value));
             if(tempCel.Count != 0)
-                
-                tempCel.ForEach(c => c.hypothesis.Remove(cell.values));
+                tempCel.ForEach(c => c.hypothesis.Remove(cell.value));
             this.cellsList.Add(cell);
+        }
+
+        public bool ExistInEnsemble(Cell c)
+        {
+            return this.cellsList.Exists(cell => cell.value.Equals(c.value));
         }
 
         public static Ensemble operator +(Ensemble s1, Cell c2)
