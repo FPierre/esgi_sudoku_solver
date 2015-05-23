@@ -36,11 +36,11 @@ namespace Sudoku
 
 		public static string getMainMenu(){
 
-			return  " ****** Menu ******\n "
-				+ " 1 – Sudoku file validation\n "
-				+ " 2 – Sudoku file resolution\n "
-				+ " 3 – Sudoku grid Generation\n "
-				+ " 4 – Quit\n "
+			return  " ****** Menu ****** "+Environment.NewLine
+				+ " 1 – Sudoku file validation "+Environment.NewLine
+				+ " 2 – Sudoku file resolution " +Environment.NewLine
+				+ " 3 – Sudoku grid Generation " +Environment.NewLine
+				+ " 4 – Quit " + Environment.NewLine
 				+ " Choice ? : " ;
 		}
 

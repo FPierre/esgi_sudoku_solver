@@ -87,11 +87,11 @@ namespace Sudoku
         public string ToString()
         {
             StringBuilder text = new StringBuilder() ;
+    
             for(int i = 0 ; i < grid.Length ; i++)
             {
                 for(int j = 0 ; j < grid.Length ; j++)
                 {
-                    Console.Write(grid[i, j].value);
                     text.AppendFormat("{0,3}", grid[i, j].value);
                 }
                 text.Append(Environment.NewLine);

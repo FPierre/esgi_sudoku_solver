@@ -47,6 +47,7 @@
     <Compile Include="Ensemble.cs" />
     <Compile Include="CellsGrid.cs" />
     <Compile Include="Resolver.cs" />
+    <Compile Include="SudokuManager.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

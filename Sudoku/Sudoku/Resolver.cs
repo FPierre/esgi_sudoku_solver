@@ -31,6 +31,7 @@ namespace Sudoku
 //			}
 //		}
 		public void RecursivebrowseGrid (CellsGrid grid, int line, int column) {
+
 			for (int i = line; i < grid.size; i++) {
 				for (int j = column; j < grid.size; j++) {
 					if (grid[i,j].ValuesIsNull()) {
