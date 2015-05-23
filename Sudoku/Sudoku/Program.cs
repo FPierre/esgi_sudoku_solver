@@ -74,10 +74,10 @@ namespace Sudoku
 			switch (choice)
 			{
 			case 1:
-				SudokuManager (path, delimiter, choice);
+				SudokuManager(path, delimiter, choice);
 				break;
 			case 2:
-				SudokuManager (path, delimiter, choice);
+				SudokuManager(path, delimiter, choice);
 				break;
 			case 3:
 				Console.WriteLine("/!\\ Sudoku grid Generation Coming soon!");

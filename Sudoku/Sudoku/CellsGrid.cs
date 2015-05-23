@@ -6,12 +6,12 @@ namespace Sudoku
 {
 	public class CellsGrid
 	{
-        Cell[,] grid
+        protected internal Cell[,] grid
         {
             get;
             set;
         }
-        int size
+         protected internal int size
         {
             get;
             set;
