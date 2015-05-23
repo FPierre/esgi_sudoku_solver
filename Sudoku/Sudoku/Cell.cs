@@ -70,7 +70,7 @@ namespace Sudoku
             {
                 monEnsemble.Add(this);
             }
-            this.calculateNewHipothesis();
+            //this.calculateNewHipothesis();
         }
 
 /*
