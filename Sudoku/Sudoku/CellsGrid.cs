@@ -6,15 +6,24 @@ namespace Sudoku
 {
 	public class CellsGrid
 	{
-        Cell[,] grid
+        protected internal Cell[,] grid
         {
             get;
             set;
         }
-        int size
+         protected internal int size
         {
             get;
             set;
+        }
+
+        public Cell this[int i,int j]
+        {
+            get
+            {
+                return grid[i, j];
+
+            }
         }
        
         
@@ -58,6 +67,9 @@ namespace Sudoku
             }
 		}
 
+
+
+
         public bool isDone()
         {
             foreach(Cell cell in grid)
@@ -86,8 +98,6 @@ namespace Sudoku
             }
             return text.ToString();
         }
-
-
 
 	}
 }

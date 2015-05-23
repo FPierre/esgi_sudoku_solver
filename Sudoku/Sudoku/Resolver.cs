@@ -13,7 +13,8 @@ namespace Sudoku
 		}
 
 		public void resolve (CellsGrid grid) {
-			listHypotheticSudoku.add(index, grid);
+
+			listHypotheticSudoku.Add(index, grid);
 			this.index++;
 			RecursivebrowseGrid (grid, 0, 0);
 
@@ -29,14 +30,16 @@ namespace Sudoku
 //				}
 //			}
 //		}
-		public Cell RecursivebrowseGrid (CellsGrid grid, int line, int column) {
+		public void RecursivebrowseGrid (CellsGrid grid, int line, int column) {
 			for (int i = line; i < grid.size; i++) {
 				for (int j = column; j < grid.size; j++) {
-					if (grid [i] [j].valueIsNull) {
-						Cell myCell = grid [i] [j];
-						for (int h = 0; h < myCell.hypothesis.Capacity; h++) {
-							int hypothesisTest = myCell.hypothesis [h];
-							if (myCell.ExistsInEnsemble (h) == false) {
+					if (grid[i,j].ValuesIsNull()) {
+						Cell myCell = grid [i,j];
+						for (int h = 0; h < myCell.hypothesis.Count; h++) {
+                           
+							int hypothesisTest = Convert.ToInt32( myCell.hypothesis[h]);
+                            if (myCell.ExistsInEnsemble(hypothesisTest) == false)
+                            {
 								myCell.value = hypothesisTest.ToString();
 								if (grid.isDone ()) {
 									Console.WriteLine ("solution trouvée!");
