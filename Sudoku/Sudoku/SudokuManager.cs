@@ -104,22 +104,52 @@ namespace Sudoku {
         }
 
         private string checkAllSudoku(int mode) {
+            const String error = "Le sudoku est invalide {0}";
+
             foreach (Model model in this.ModelList) {
                 model.ToString();
 
+                // Si le sudoku n'est pas un format supporté tel que 9x9, 16x16 ou 25x25
+                if (model.Size % 
+                    Convert.ToInt32(Math.Floor(Math.Sqrt(model.Size))) != 0) {
+                    return String.Format(error, "(format non supporté, devrait être 9x9, 16x16 ou 25x25).");
+                }
+
+                // Compteur de la taille des lignes et colonnes
+                int counterLine = 0, counterColumn = 0;
+                // Liste pour futur check de caractères
+                List<string> allValues = new List<string>();
                 string required = model.Required;
-                if (mode == 1)
+                // Ajout du "." au pattern pour la résolution
+                if (mode == 1) 
                     required += ".";
 
                 for (int i=0; i < model.Size; ++i) {
+                    if (counterLine > model.Size)
+                        return String.Format(error, "(une colonne est plus grande que le pattern).");
+
                     for (int j=0; j < model.Size; ++j) {
+                        if (counterColumn > model.Size)
+                            return String.Format(error, "(une colonne est plus grande que le pattern).");
+
                         string s = model.Grid[i].Value[i, j];
 
-                        if (required.Contains(s))
-                            continue;
-                        else
-                            return "Le sudoku est invalide (des valeurs sont manquantes).";
+                        // Comparaison des valeurs au pattern
+                        if (!required.Contains(s))
+                            return String.Format(error, "(des valeurs sont manquantes).");
+
+                        // Ajoute la valeur dans la liste pour les check
+                        allValues.Add(s);
+
+                        counterColumn++;
                     }
+
+                    counterLine++;
+                }
+
+                // Vérifier qu'il n'y ait pas que des "."
+                if (allValues.Count(c => c == ".") == model.Size) {
+                    return String.Format(error, "(toutes les valeurs sont vides).");
                 }
             }
             return "Le sudoku est valide.";
