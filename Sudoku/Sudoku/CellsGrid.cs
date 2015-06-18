@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Text;
+using System.Linq;
 
 namespace Sudoku
 {
@@ -25,50 +26,87 @@ namespace Sudoku
 
             }
         }
-       
+
+
+        public String name
+        {
+            get;
+            set;
+        }
+
+        public String  date
+        {
+            get;
+            set;
+        }
+
+        public String required;
+
+
+        public String error
+        {
+            get;
+            set;
+        }
+
+        public bool isValid
+        {
+
+            get;
+            set;
+        }
+
         
-		public CellsGrid (String[,] value , List<String> defaultValues) 
+		public CellsGrid (Cell[,] value , List<String> defaultValues)  
 		{
-            List<Ensemble> MesEnsembleLine = new List<Ensemble>();
-            List<Ensemble> MesEnsembleColumn = new List<Ensemble>();
-            List<Ensemble> MesEnsembleSector = new List<Ensemble>();
+     
             size = defaultValues.Count;
-            grid = new Cell[size,size];
-
-            for(int i = 0 ; i < value.Length ; i ++)
-            {
-                if (MesEnsembleColumn[i] == null)
-                    MesEnsembleColumn[i] = new Ensemble(new List<Cell>());
-                   
-                for(int j = 0 ; j < value.Length ; j++)
-                {
-                    if (MesEnsembleLine[j] == null)
-                        MesEnsembleLine[j] = new Ensemble(new List<Cell>());
-
-                    double sqrtNumber = Math.Sqrt((Convert.ToDouble( value.Length)));
-                    int indexSector = (int) (Math.Floor(i/sqrtNumber)  + Math.Floor(j/sqrtNumber) * sqrtNumber);
-                   
-
-                    if(MesEnsembleSector[indexSector] == null)
-                        MesEnsembleSector[indexSector] = new Ensemble(new List<Cell>());
-                    
-                    Cell myCell = new Cell(value[i, j],defaultValues);
-                    if(myCell.ExistsInEnsemble(MesEnsembleColumn[i],MesEnsembleLine[j],MesEnsembleSector[indexSector]))
-                    {
-                        myCell.add(MesEnsembleColumn[i], MesEnsembleLine[j], MesEnsembleSector[indexSector]);
-                        grid[i, j] = myCell; 
-                    }
-                    else
-                    {
-                        String text = String.Format("la cellule à l'index {0},{1} a une valeur semblable dans sa ligne, dans sa colonne ou dans son secteur",i, j);
-                        throw new Exception(text);
-                    }
-                }
-            }
+            grid = value;
+            required = defaultValues.Aggregate( (i , j) => i +j);
+       //     verifyAppearance();
 		}
 
 
+        public CellsGrid(Cell[,] value , List<String> defaultValues , String date, String name) : this(value,defaultValues)
+        {
+            this.date = date;
+            this.name = name;
+        }
 
+
+
+
+
+
+
+
+        public void verifyAppearance()
+        {
+            for (int i = 0; i < this.size; i++)
+            {
+                for (int j = 0; j < this.size; j++)
+                {
+                    Cell myCell = grid[i, j];
+                    if (!myCell.ExistsInItsEnsemble())
+                    {
+ //                       myCell.add(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector]);
+                        grid[i, j] = myCell;
+                    }
+                    else
+                    {
+                        
+                        error = String.Format("grille : {3} {4}la cellule à l'index {0},{1} a une valeur semblable dans sa ligne, dans sa colonne ou dans son secteur", i, j,this.name,Environment.NewLine);
+                        Console.Out.WriteLine(error);
+                        this.isValid = false;
+                        break;
+                    }
+                }
+
+            }
+        }
+
+
+        
 
         public bool isDone()
         {

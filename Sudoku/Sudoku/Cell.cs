@@ -8,34 +8,26 @@ namespace Sudoku
 {
 	public class Cell
 	{
-		
-		private Ensemble listColumn {
-			get {
-				return this.listColumn;
-			}
-			set{
-				this.listColumn = value;
-			}
-		}
-		private Ensemble listLine{
-			get {
-					return this.listLine;
-			}
-			set{
-					this.listLine = value;
-			}
-		}
-		private Ensemble listSector {
-			get {
-				return this.listLine;
-			}
-			set {
-				this.listLine = value;
-			}
-		}
+
+        protected internal Ensemble listColumn
+        {
+            get;
+            set;
+        }
+        protected internal Ensemble listLine
+        {
+            get;
+            set;
+        }
+        protected internal Ensemble listSector
+        {
+            get;
+            set;
+        }
 
 		protected internal List<String> hypothesis;
         protected internal String value;
+
 
 		public Cell (Ensemble listColumn , Ensemble listLine , Ensemble listSector,String value,List<String> hypothesis)
 		{
@@ -46,23 +38,42 @@ namespace Sudoku
 			this.hypothesis = hypothesis;
 		}
 
-		public Cell (String value,List<String> hypothesis)
+		private Cell (String value,List<String> hypothesis)
 		{
             this.value = value;
             this.hypothesis = hypothesis;
 		}
 
+        private Cell(String value, String hypothesis)
+            : this(value,new List<String>(Utility.SplitWithSeparatorEmpty(hypothesis)))
+        {
+   
+        }
+
+        private Cell(Cell cell, string hypothesis) : this(cell.value,new List<String>(Utility.SplitWithSeparatorEmpty(hypothesis)))
+        {
+
+        }
+
 		public bool ExistsInEnsemble(params Ensemble[] t)
 		{
-            bool exists = true;
+            bool exists = false;
             int i = 0;
-            while(i < t.Length && exists == true)
+            while(i < t.Length && exists == false)
             {
-                exists = t[i].ExistInEnsemble(this);
+                if(t[i].ExistInEnsemble(this))
+                    exists = true;
 	             i++;
             }
             return exists;	
 		}
+
+        public bool ExistsInItsEnsemble()
+        {
+        
+            return this.ExistsInEnsemble(listColumn, listLine, listSector);
+
+        }
 
         public void add(params Ensemble[]t)
         {
@@ -70,6 +81,12 @@ namespace Sudoku
             {
                 monEnsemble.Add(this);
             }
+            //this.calculateNewHipothesis();
+        }
+
+        public void addItsEnsemble()
+        {
+            this.add(listColumn, listLine, listSector);
             //this.calculateNewHipothesis();
         }
 

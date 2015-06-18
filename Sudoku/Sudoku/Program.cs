@@ -53,6 +53,7 @@ namespace Sudoku
 			case 1:
 				result += " –> Sudoku file validation ";
                  SudokuManager manager = new SudokuManager(Properties.Resources.testSudoku);
+
                  
 				break;
 			case 2:

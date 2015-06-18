@@ -17,13 +17,18 @@ namespace Sudoku
 			this.cellsList = cellsList;
 		}
 
+        public Ensemble()
+        {
+            this.cellsList = new List<Cell>();
+        }
+
 
         public void Add(Cell cell)
         {
             this.cellsList.Add(cell);
             if (!cell.value.Equals("."))
             {
-                cell.hypothesis = null;
+                //cell.hypothesis = null;
                 List<Cell> tempCel = this.cellsList.FindAll(c => c.hypothesis.Contains(cell.value));
                 if (tempCel.Count != 0)
                     tempCel.ForEach(c => c.hypothesis.Remove(cell.value));
@@ -45,7 +50,9 @@ namespace Sudoku
 
         public bool ExistInEnsemble(Cell c)
         {
-            return this.cellsList.Exists(cell => cell.value.Equals(c.value));
+            if(!c.value.Equals("."))
+                return this.cellsList.Exists(cell => cell.value.Equals(c.value));
+            return false;
         }
 
         public static Ensemble operator +(Ensemble s1, Cell c2)
