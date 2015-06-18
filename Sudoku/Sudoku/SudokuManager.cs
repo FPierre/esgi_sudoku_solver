@@ -17,7 +17,7 @@ namespace Sudoku {
          * @param (string) delimiter = Chaîne de caractères de séparation des sudokus (optionnel)
          * @param (int) mode = Mode du manager 0 = validation, 1 = résolution (optionnel)
          **/
-        public SudokuManager(string path, string delimiter = "---------------------------------------", int mode = 0) {
+        public SudokuManager(string path, string delimiter = "//", int mode = 1) {
             this.Path = path;
             this.Delimiter = delimiter;
             this.ModelList = new List<Model>();
@@ -29,7 +29,7 @@ namespace Sudoku {
             }
 
             if (populateList()) {
-                checkAllSudoku(this.Mode);
+               checkAllSudoku(this.Mode);
             }
         }
 
@@ -67,36 +67,50 @@ namespace Sudoku {
                 return false;
             }
 
-            var allSudoku = file.Split(new string[] { "\r\n" }, StringSplitOptions.None);
+            var allSudoku = file.Split(new string[] { Environment.NewLine }, StringSplitOptions.None);
 
             if (allSudoku.Length == 0) {
                 Console.WriteLine("Erreur: " + this.Path + " ne contient pas de valeurs valides.");
                 return false;
             }
-
+            int size = 0;
             for (int i=0; i < allSudoku.Length; ++i) {
-                string line = allSudoku[i];
 
                 // D'après la 1ère délimitation d'un sudoku...
-                if (line.StartsWith(this.Delimiter)) {
-                    string name = allSudoku[i].Replace(this.Delimiter, string.Empty);
-                    string date = allSudoku[i + 1];
-                    int size = allSudoku[i + 2].Length;
-                    string required = allSudoku[i + 2];
+                if (allSudoku[i].StartsWith(this.Delimiter))
+                {
+
+                    int currentLine = i + 1;
+                    string name = allSudoku[currentLine].Replace(this.Delimiter, string.Empty);
+                    currentLine++;
+                    string date = allSudoku[currentLine];
+                    currentLine++;
+                    size = allSudoku[currentLine].Length;
+                    string required = allSudoku[currentLine];
 
                     List<LineValue> valueList = new List<LineValue>();
-                    LineValue value = new LineValue(size, i);  // c = caractère, i = ligne
+                    LineValue value = new LineValue(size);  // c = caractère, i = ligne
 
                     // Récupèrer la grille de sudoku
-                    for (int j=2, k=0; k < size; ++j, ++k) {
-                        value.populateLineValue(line[j].ToString(), k);
+                    currentLine = currentLine + 1;
+                    int limit = currentLine + size;
+                    for (; currentLine < limit; currentLine++)
+                    {
+                        String[] tempLine = this.SplitWithSeparatorEmpty(allSudoku[currentLine]);
+                        for (int k = 0; k < size;  ++k)
+                        {
+                            value.populateLineValue(tempLine[k].ToString(), k);  
+                        }
+                        
                         valueList.Add(value);
+                        value.PosLine++;
                     }
+                        
 
                     this.ModelList.Add(new Model(name, date, valueList, required, size));
 
                     // Passer au prochain sudoku
-                    i += size;
+                    i += limit;
                 }
             }
 
@@ -112,7 +126,10 @@ namespace Sudoku {
                 // Si le sudoku n'est pas un format supporté tel que 9x9, 16x16 ou 25x25
                 if (model.Size % 
                     Convert.ToInt32(Math.Floor(Math.Sqrt(model.Size))) != 0) {
-                    return String.Format(error, "(format non supporté, devrait être 9x9, 16x16 ou 25x25).");
+                        model.isValid = false;
+                        model.error += String.Format(error, "(format non supporté, devrait être 9x9, 16x16 ou 25x25).");
+
+                    //return String.Format(error, "(format non supporté, devrait être 9x9, 16x16 ou 25x25).");
                 }
 
                 // Compteur de la taille des lignes et colonnes
@@ -126,33 +143,56 @@ namespace Sudoku {
 
                 for (int i=0; i < model.Size; ++i) {
                     if (counterLine > model.Size)
-                        return String.Format(error, "(une colonne est plus grande que le pattern).");
-
+                    {
+                          model.isValid = false;
+                          model.error += String.Format(error, "(une ligne est plus grande que le pattern).");
+                    }
                     for (int j=0; j < model.Size; ++j) {
                         if (counterColumn > model.Size)
-                            return String.Format(error, "(une colonne est plus grande que le pattern).");
+                        {
+                            model.isValid = false;
+                            model.error += String.Format(error, "(une colonne est plus grande que le pattern).");
+                        } 
+               
 
                         string s = model.Grid[i].Value[i, j];
 
                         // Comparaison des valeurs au pattern
                         if (!required.Contains(s))
-                            return String.Format(error, "(des valeurs sont manquantes).");
+                        {
+                            model.isValid = false;
+                            model.error += String.Format(error, "(des valeurs sont manquantes).");
+                        }
 
                         // Ajoute la valeur dans la liste pour les check
                         allValues.Add(s);
-
                         counterColumn++;
                     }
-
+                    counterColumn = 0;
                     counterLine++;
                 }
-
+                counterLine = 0;
+                
                 // Vérifier qu'il n'y ait pas que des "."
                 if (allValues.Count(c => c == ".") == model.Size) {
                     return String.Format(error, "(toutes les valeurs sont vides).");
                 }
+
             }
             return "Le sudoku est valide.";
+        }
+
+
+        private String[] SplitWithSeparatorEmpty(String s)
+        {
+            int number = s.Length;
+            char[] c = s.ToCharArray();
+            String[] stringTable = new string[number];
+            for (int i = 0; i < number; i++)
+            {
+                stringTable[i] = "" + c[i];
+            }
+            return stringTable;
         }
     }
 
@@ -162,6 +202,8 @@ namespace Sudoku {
         private List<LineValue> grid;
         private string required;
         private int size;
+        public String error;
+        public bool isValid;
 
         public Model(string name, string date, List<LineValue> grid, string required, int size) {
             this.name = name;
