@@ -54,16 +54,12 @@ namespace Sudoku {
 
         private void verifyIntegrityOfAllSudoku() {
             int size = 0;
-            bool readFirstLine = false;
             using (StreamReader file = new StreamReader(path))
             {
-                do
-                {
-                    if (readFirstLine == false)
-                    {
+             
+
                         this.delimiter = file.ReadLine();
-                        readFirstLine = true;
-                    }
+
                     do
                     {
                         String name = file.ReadLine();
@@ -78,6 +74,7 @@ namespace Sudoku {
                         List<Ensemble> MesEnsembleColumn = new List<Ensemble>();
                         List<Ensemble> MesEnsembleSector = new List<Ensemble>();
                         Cell myCell;
+                        int numberOfDots = 0;
                         for ( int i = 0; i < size; i++)
                         {
                             verifyEnsemble(MesEnsembleLine, i);
@@ -93,16 +90,16 @@ namespace Sudoku {
                                 myCell = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], tempLine[j], new List<String>(Utility.SplitWithSeparatorEmpty(required))); ;
 
 
-                                if(i == 8 && j ==7)
-                                {
-                                    Console.Out.WriteLine("test");
-                                }
 
                                 if (required.Contains(tempLine[j]) || tempLine[j].Equals("."))
                                 {
                                     if(!tempLine[j].Equals("."))
                                     {
                                         isFullyOfPoint = false;
+                                    }
+                                    else
+                                    {
+                                        numberOfDots++;
                                     }
 
                                     tableCell[i, j] = myCell;
@@ -113,22 +110,30 @@ namespace Sudoku {
                                     else
                                     {
                                         error = String.Format("grille : {2} {3}la cellule à l'index ({0} , {1}) a une valeur semblable dans sa ligne, dans sa colonne ou dans son secteur", i, j, name, Environment.NewLine);
-                                        Console.Out.WriteLine(error);
+                                        
+                                        break;
                                     }
                                 }
                                 else
                                 {
                                     error = String.Format("grill : {0} {1} la cellule à l'index ({2}, {3}) n'est pas comprise dans les valeurs requises {4} {5}, Values {6}", name, Environment.NewLine, i, j, required, Environment.NewLine, tempLine[j]);
+                                    break;
                                 }
+                            }
+
+                            if(!error.Equals(String.Empty))
+                            {
+                                break;
                             }
               
                         }
                         List<String> maListe = new List<string>(Utility.SplitWithSeparatorEmpty(required));
-                        if (error.Equals(String.Empty))
+                        if (error.Equals(String.Empty) && isFullyOfPoint == false)
                         {
                             this.ModelList.Add(new CellsGrid(tableCell, maListe, date, name));
-                           Console.Out.WriteLine( this.modelList.Last().ToString());
-                           Console.ReadLine();
+                            this.ModelList.Last().numberOfDots = numberOfDots;
+                          // Console.Out.WriteLine( this.modelList.Last().ToString());
+                          // Console.ReadLine();
 
                         }
 
@@ -144,12 +149,23 @@ namespace Sudoku {
                             this.modelList.Last().error += String.Format(error, "grille {0} n'a aucun chiffre", name);
                         }
 
-                       
+                        String line = String.Empty;
+                        do
+                        {
+                            line= file.ReadLine();
+                            if(string.IsNullOrEmpty(line))
+                            {
+                              line = String.Empty;
+                            }
+
+
+                        }
+                        while (!file.EndOfStream && !line.Equals(this.delimiter));
+
+
                        
                     }
-                    while (!file.ReadLine().Equals(this.delimiter));
-                }
-                while (!file.EndOfStream );
+                    while (!file.EndOfStream );
             }
        
         }
@@ -166,7 +182,14 @@ namespace Sudoku {
                 // Console.Out.WriteLine(e.Message);
                 ensemble.Add(new Ensemble(new List<Cell>()));
             }
+        }
 
+        public void resolveAll()
+        {
+            foreach(CellsGrid grid in modelList)
+            {
+                grid.resolveGrid();
+            }
         }
 /*
         private string checkAllSudoku(int mode) {

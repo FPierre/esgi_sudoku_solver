@@ -9,6 +9,8 @@ namespace Sudoku
     class ConsoleMenu
     {
         private static int choice;
+        public static SudokuManager manager;
+        private static bool managerIsOn = false;
 
         public static void show()
         {
@@ -43,10 +45,14 @@ namespace Sudoku
             {
                 case 1:
                     result += "–> Sudoku file validation ";
-                     SudokuManager manager = new SudokuManager(Properties.Resources.testSudoku);
+                    manager = new SudokuManager(Properties.Resources.testSudoku);
+                    managerIsOn = true;
                     break;
                 case 2:
                     result += "–> Sudoku file resolution ";
+                    if(managerIsOn == false)
+                        manager = new SudokuManager(Properties.Resources.testSudoku);
+                    manager.resolveAll();
                     break;
                 case 3:
                     result += "–> Bye bye ! ";

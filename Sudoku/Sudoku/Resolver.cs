@@ -10,6 +10,7 @@ namespace Sudoku
 
 		public Resolver ()
 		{
+            listHypotheticSudoku = new Dictionary<int, CellsGrid>();
 		}
 
 		public void resolve (CellsGrid grid) {
@@ -45,7 +46,11 @@ namespace Sudoku
 								if (grid.isDone ()) {
 									Console.WriteLine ("solution trouvée!");
 									grid.ToString ();
+
 								} else {
+                                    Console.Out.WriteLine("recursive solution");
+                                    Console.Out.WriteLine(grid);
+                                    Console.ReadLine();
 									RecursivebrowseGrid (grid, i, j);
 								}
 							} else {

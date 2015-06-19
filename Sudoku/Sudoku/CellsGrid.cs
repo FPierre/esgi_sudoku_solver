@@ -58,6 +58,13 @@ namespace Sudoku
             set;
         }
 
+        internal int numberOfDots
+        {
+
+            get;
+            set;
+        }
+
         
 		public CellsGrid (Cell[,] value , List<String> defaultValues)  
 		{
@@ -76,6 +83,36 @@ namespace Sudoku
         }
 
 
+        public void resolveGrid()
+        {
+            
+            do
+            {
+                int oldNumberResolution = numberOfDots;
+                bool doSomething = false;
+                foreach(Cell c in grid)
+                {
+                    if(c.value.Equals(".") && c.hypothesis.Count == 1)
+                    {
+                        c.value = c.hypothesis.First();
+                        c.diffuseInItsEnsemble();
+                        doSomething = true;
+                        numberOfDots--;
+                        Console.WriteLine(this);
+                        Console.ReadLine();
+                    }
+                }
+                if (doSomething == false && oldNumberResolution == numberOfDots)
+                {
+                    new Resolver().resolve(this);
+                }
+
+
+            }
+            while (!this.isDone());
+        }
+
+        
 
 
 
@@ -124,7 +161,7 @@ namespace Sudoku
         }
 
 
-        public string ToString()
+        public override string ToString()
         {
             StringBuilder text = new StringBuilder() ;
             text.Append(name);

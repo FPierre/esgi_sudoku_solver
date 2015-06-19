@@ -26,6 +26,13 @@ namespace Sudoku
         public void Add(Cell cell)
         {
             this.cellsList.Add(cell);
+            this.diffuse(cell);   
+        }
+
+
+
+        public void diffuse(Cell cell)
+        {
             if (!cell.value.Equals("."))
             {
                 //cell.hypothesis = null;
@@ -33,23 +40,19 @@ namespace Sudoku
                 if (tempCel.Count != 0)
                 {
                     tempCel.ForEach(c => c.hypothesis.Remove(cell.value));
-            
-                
+
+
                 }
             }
 
-                foreach(Cell c in this.cellsList)
+            foreach (Cell c in this.cellsList)
+            {
+                if (cell.hypothesis.Contains(c.value))
                 {
-                    if(cell.hypothesis.Contains(c.value))
-                    {
-                        cell.hypothesis.Remove(c.value);
-                    }
+                    cell.hypothesis.Remove(c.value);
                 }
-            
-            
-            
+            }
         }
-
         public bool ExistInEnsemble(Cell c)
         {
             if(!c.value.Equals("."))

@@ -90,6 +90,19 @@ namespace Sudoku
             //this.calculateNewHipothesis();
         }
 
+        public void diffuseInItsEnsemble()
+        {
+            this.diffuse(listColumn, listLine, listSector);
+        }
+
+        private void diffuse(params Ensemble[] t)
+        {
+            foreach (Ensemble monEnsemble in t)
+            {
+                monEnsemble.diffuse(this);
+            }
+        }
+
 /*
         public void calculateNewHipothesis()
         {
