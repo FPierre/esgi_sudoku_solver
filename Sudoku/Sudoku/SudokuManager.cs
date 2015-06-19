@@ -28,10 +28,6 @@ namespace Sudoku {
                 Console.WriteLine("Erreur: " + this.Path + " n'existe pas.");
                 return;
             }
-
-            if (populateList()) {
-               checkAllSudoku(this.Mode);
-            }
         }
 
         public string Path {
@@ -54,7 +50,7 @@ namespace Sudoku {
             set { this.mode = value; }
         }
 
-        private bool populateList() {
+        private void verifyIntegrityOfAllSudoku() {
             int size = 0;
             bool readFirstLine = false;
             using (StreamReader file = new StreamReader(path))
@@ -75,6 +71,7 @@ namespace Sudoku {
                         Cell[,] tableCell = new Cell[size, size];
 
                         String error = String.Empty;
+                        bool isFullyOfPoint = true;
                         List<Ensemble> MesEnsembleLine = new List<Ensemble>();
                         List<Ensemble> MesEnsembleColumn = new List<Ensemble>();
                         List<Ensemble> MesEnsembleSector = new List<Ensemble>();
@@ -87,19 +84,33 @@ namespace Sudoku {
                             {
 
                                 verifyEnsemble(MesEnsembleColumn, j);
+              
                                 double sqrtNumber = Math.Sqrt((Convert.ToDouble(size)));
                                 int indexSector = ((int)(Math.Floor(i / sqrtNumber) * sqrtNumber + Math.Floor(j / sqrtNumber)));
                                 verifyEnsemble(MesEnsembleSector, indexSector);
                                 myCell = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], tempLine[j], new List<String>(Utility.SplitWithSeparatorEmpty(required))); ;
-                                tableCell[i, j] = myCell;
-                                if(!myCell.ExistsInItsEnsemble())
+
+                                if (required.Contains(tempLine[j]) || tempLine[j].Equals("."))
                                 {
-                                    myCell.addItsEnsemble();
+                                    if(!tempLine[j].Equals("."))
+                                    {
+                                        isFullyOfPoint = false;
+                                    }
+
+                                    tableCell[i, j] = myCell;
+                                    if (!myCell.ExistsInItsEnsemble())
+                                    {
+                                        myCell.addItsEnsemble();
+                                    }
+                                    else
+                                    {
+                                        error = String.Format("grille : {2} {3}la cellule à l'index ({0} , {1}) a une valeur semblable dans sa ligne, dans sa colonne ou dans son secteur", i, j, name, Environment.NewLine);
+                                        Console.Out.WriteLine(error);
+                                    }
                                 }
                                 else
                                 {
-                                    error = String.Format("grille : {2} {3}la cellule à l'index {0},{1} a une valeur semblable dans sa ligne, dans sa colonne ou dans son secteur", i, j, name, Environment.NewLine);
-                                    Console.Out.WriteLine(error);
+                                    error = String.Format("grill : {0} {1} la cellule à l'index ({2}, {3}) n'est pas comprise dans les valeurs requises {4} {5}, Values {6}", name, Environment.NewLine, i, j, required, Environment.NewLine, tempLine[j]);
                                 }
                             }
               
@@ -107,12 +118,25 @@ namespace Sudoku {
                         List<String> maListe = new List<string>(Utility.SplitWithSeparatorEmpty(required));
                         if(error.Equals(String.Empty))
                             this.ModelList.Add(new CellsGrid(tableCell, maListe, date, name));
+
+                        if((Convert.ToInt32(Math.Floor(Math.Sqrt(this.modelList.Last().size) ))) != 0)
+                        {
+                           this.modelList.Last().isValid = false;
+                           this.modelList.Last().error += String.Format(error, "(format non supporté, devrait être 9x9, 16x16 ou 25x25).");
+                        }
+
+                        if(isFullyOfPoint == true)
+                        {
+                            this.modelList.Last().isValid = false;
+                            this.modelList.Last().error += String.Format(error, "grille {0} n'a aucun chiffre", name);
+                        }
+                       
                     }
                     while (!file.ReadLine().Equals(this.delimiter));
                 }
                 while (!file.EndOfStream );
             }
-            return true;
+       
         }
 
         private void verifyEnsemble(List<Ensemble> ensemble, int pos)
@@ -129,7 +153,7 @@ namespace Sudoku {
             }
 
         }
-
+/*
         private string checkAllSudoku(int mode) {
             const String error = "Le sudoku est invalide {0}";
 
@@ -194,5 +218,6 @@ namespace Sudoku {
             }
             return "Le sudoku est valide.";
         } 
+ */
     }
 }
