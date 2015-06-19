@@ -7,6 +7,8 @@ namespace Sudoku
 {
 	public class CellsGrid
 	{
+        private static string gridDelimiter = @"//---------------------------";
+
         protected internal Cell[,] grid
         {
             get;
