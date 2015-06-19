@@ -127,15 +127,23 @@ namespace Sudoku
         public string ToString()
         {
             StringBuilder text = new StringBuilder() ;
-    
-            for(int i = 0 ; i < grid.Length ; i++)
+            text.Append(name);
+
+            text.Append(Environment.NewLine);
+            text.Append(date);
+            text.Append(Environment.NewLine);
+            for(int i = 0 ; i < size; i++)
             {
-                for(int j = 0 ; j < grid.Length ; j++)
+                for(int j = 0 ; j < size ; j++)
                 {
                     text.AppendFormat("{0,3}", grid[i, j].value);
+                    if (grid[i, j].hypothesis.Count != 0 )
+                        text.AppendFormat("({0})", grid[i, j].hypothesis.Aggregate((stringa,stringb) => stringa+ stringb));
+                   // text.AppendFormat("({0})", grid[i, j].hypothesis.Aggregate((stringa, stringb) => stringa + stringb));
                 }
                 text.Append(Environment.NewLine);
             }
+            text.Append(Environment.NewLine);
             return text.ToString();
         }
 

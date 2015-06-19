@@ -28,6 +28,8 @@ namespace Sudoku {
                 Console.WriteLine("Erreur: " + this.Path + " n'existe pas.");
                 return;
             }
+
+            this.verifyIntegrityOfAllSudoku();
         }
 
         public string Path {
@@ -90,6 +92,12 @@ namespace Sudoku {
                                 verifyEnsemble(MesEnsembleSector, indexSector);
                                 myCell = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], tempLine[j], new List<String>(Utility.SplitWithSeparatorEmpty(required))); ;
 
+
+                                if(i == 8 && j ==7)
+                                {
+                                    Console.Out.WriteLine("test");
+                                }
+
                                 if (required.Contains(tempLine[j]) || tempLine[j].Equals("."))
                                 {
                                     if(!tempLine[j].Equals("."))
@@ -116,8 +124,13 @@ namespace Sudoku {
               
                         }
                         List<String> maListe = new List<string>(Utility.SplitWithSeparatorEmpty(required));
-                        if(error.Equals(String.Empty))
+                        if (error.Equals(String.Empty))
+                        {
                             this.ModelList.Add(new CellsGrid(tableCell, maListe, date, name));
+                           Console.Out.WriteLine( this.modelList.Last().ToString());
+                           Console.ReadLine();
+
+                        }
 
                         if((Convert.ToInt32(Math.Floor(Math.Sqrt(this.modelList.Last().size) ))) != 0)
                         {
@@ -130,6 +143,8 @@ namespace Sudoku {
                             this.modelList.Last().isValid = false;
                             this.modelList.Last().error += String.Format(error, "grille {0} n'a aucun chiffre", name);
                         }
+
+                       
                        
                     }
                     while (!file.ReadLine().Equals(this.delimiter));
@@ -143,7 +158,7 @@ namespace Sudoku {
         {
             try
             {
-                if (ensemble[pos] == null)
+                if(ensemble.Count <= pos )
                     ensemble.Add(new Ensemble(new List<Cell>()));
             }
             catch (Exception e)

@@ -31,10 +31,12 @@ namespace Sudoku
                 //cell.hypothesis = null;
                 List<Cell> tempCel = this.cellsList.FindAll(c => c.hypothesis.Contains(cell.value));
                 if (tempCel.Count != 0)
+                {
                     tempCel.ForEach(c => c.hypothesis.Remove(cell.value));
+            
+                
+                }
             }
-            else
-            {
 
                 foreach(Cell c in this.cellsList)
                 {
@@ -43,7 +45,7 @@ namespace Sudoku
                         cell.hypothesis.Remove(c.value);
                     }
                 }
-            }
+            
             
             
         }
