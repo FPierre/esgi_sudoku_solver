@@ -55,6 +55,11 @@ namespace Sudoku
 
         }
 
+        public Cell(Cell cell) : this(cell.value,cell.hypothesis)
+        {
+
+        }
+
 		public bool ExistsInEnsemble(params Ensemble[] t)
 		{
             bool exists = false;
@@ -136,6 +141,25 @@ namespace Sudoku
 
 
 
+
+        internal bool existInEnsembleOf(Cell cell)
+        {
+
+
+            if(cell.listColumn == this.listColumn)
+                return true;
+
+            if(cell.listLine == this.listLine)
+                return true;
+
+            if(cell.listSector == this.listSector)
+                return true;
+
+            return false;
+
+        
+
+        }
     }
 }
 

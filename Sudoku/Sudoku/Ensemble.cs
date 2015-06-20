@@ -71,6 +71,17 @@ namespace Sudoku
             return s1 + c2 ;
         }
 
+        public static bool operator ==(Ensemble s1, Ensemble s2)
+        {
+            bool result = s1.Equals(s2);
+            return result;
+        }
+
+        public static bool operator !=(Ensemble s1, Ensemble s2)
+        {
+            return (!(s1 == s2));
+        }
+
 
 	}
 }

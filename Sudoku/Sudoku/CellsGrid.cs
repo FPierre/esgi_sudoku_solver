@@ -76,6 +76,24 @@ namespace Sudoku
 		}
 
 
+        public CellsGrid (CellsGrid cellsgrid)
+        {
+            this.size = cellsgrid.size;
+            this.required = cellsgrid.required;
+            this.name = cellsgrid.name;
+            this.isValid = cellsgrid.isValid;
+            this.date = cellsgrid.date;
+            this.error = cellsgrid.error;
+            this.numberOfDots = cellsgrid.numberOfDots;
+            for(int i = 0 ; i < size ; i++)
+            {
+                for(int j = 0 ; j < size ; j++)
+                {
+                    grid[i, j] = new Cell(cellsgrid.grid[i, j]);
+                }
+            }
+        }
+
         public CellsGrid(Cell[,] value , List<String> defaultValues , String date, String name) : this(value,defaultValues)
         {
             this.date = date;
@@ -85,7 +103,7 @@ namespace Sudoku
 
         public void resolveGrid()
         {
-            
+            Resolver GridRecursiveResolver = new Resolver();
             do
             {
                 int oldNumberResolution = numberOfDots;
@@ -104,10 +122,8 @@ namespace Sudoku
                 }
                 if (doSomething == false && oldNumberResolution == numberOfDots)
                 {
-                    new Resolver().resolve(this);
+                    GridRecursiveResolver.ResolveBlockCells(this);
                 }
-
-
             }
             while (!this.isDone());
         }
@@ -121,6 +137,8 @@ namespace Sudoku
 
         public void verifyAppearance()
         {
+            
+
             for (int i = 0; i < this.size; i++)
             {
                 for (int j = 0; j < this.size; j++)
