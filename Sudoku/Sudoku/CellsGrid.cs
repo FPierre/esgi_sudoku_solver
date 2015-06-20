@@ -7,7 +7,7 @@ namespace Sudoku
 {
 	public class CellsGrid
 	{
-        private static string gridDelimiter = @"//---------------------------";
+       // private static string gridDelimiter = @"//---------------------------";
 
         protected internal Cell[,] grid
         {
@@ -58,6 +58,13 @@ namespace Sudoku
             set;
         }
 
+        public bool cantResolve
+        {
+
+            get;
+            set;
+        }
+
         internal int numberOfDots
         {
 
@@ -65,10 +72,14 @@ namespace Sudoku
             set;
         }
 
+        Resolver GridRecursiveResolver;
+           
+
         
 		public CellsGrid (Cell[,] value , List<String> defaultValues)  
 		{
-     
+            GridRecursiveResolver = new Resolver();
+            this.cantResolve = false;
             size = defaultValues.Count;
             grid = value;
             required = defaultValues.Aggregate( (i , j) => i +j);
@@ -78,6 +89,7 @@ namespace Sudoku
 
         public CellsGrid (CellsGrid cellsgrid)
         {
+            this.cantResolve = cellsgrid.cantResolve;
             this.size = cellsgrid.size;
             this.required = cellsgrid.required;
             this.name = cellsgrid.name;
@@ -85,11 +97,34 @@ namespace Sudoku
             this.date = cellsgrid.date;
             this.error = cellsgrid.error;
             this.numberOfDots = cellsgrid.numberOfDots;
+            this.GridRecursiveResolver = cellsgrid.GridRecursiveResolver;
+            this.grid = new Cell[size, size];
+            List<Ensemble> MesEnsembleLine = new List<Ensemble>();
+            List<Ensemble> MesEnsembleColumn = new List<Ensemble>();
+            List<Ensemble> MesEnsembleSector = new List<Ensemble>();
+            double sqrtNumber = Math.Sqrt((Convert.ToDouble(size)));
             for(int i = 0 ; i < size ; i++)
             {
+               if( MesEnsembleLine.Count <= i)
+               {
+                   MesEnsembleLine.Add(new Ensemble());
+               }
+
                 for(int j = 0 ; j < size ; j++)
                 {
-                    grid[i, j] = new Cell(cellsgrid.grid[i, j]);
+                    if (MesEnsembleColumn.Count <= j)
+                    {
+                        MesEnsembleColumn.Add(new Ensemble());
+                    }
+
+                    int indexSector = ((int)(Math.Floor(i / sqrtNumber) * sqrtNumber + Math.Floor(j / sqrtNumber)));
+
+                    if (MesEnsembleSector.Count <= indexSector)
+                    {
+                        MesEnsembleSector.Add(new Ensemble());
+                    }
+                   this.grid[i,j] = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], cellsgrid.grid[i, j].value, cellsgrid.grid[i,j].hypothesis );
+                    this.grid[i,j].addItsEnsemble();
                 }
             }
         }
@@ -100,10 +135,17 @@ namespace Sudoku
             this.name = name;
         }
 
-
-        public void resolveGrid()
+        private CellsGrid()
         {
-            Resolver GridRecursiveResolver = new Resolver();
+            // TODO: Complete member initialization
+        }
+
+      
+
+
+        public CellsGrid  resolveGrid()
+        {
+            CellsGrid TempGrid = new CellsGrid();
             do
             {
                 int oldNumberResolution = numberOfDots;
@@ -112,6 +154,7 @@ namespace Sudoku
                 {
                     if(c.value.Equals(".") && c.hypothesis.Count == 1)
                     {
+                        
                         c.value = c.hypothesis.First();
                         c.diffuseInItsEnsemble();
                         doSomething = true;
@@ -119,13 +162,28 @@ namespace Sudoku
                         Console.WriteLine(this);
                         Console.ReadLine();
                     }
+
+                    if(c.value.Equals(".") && c.hypothesis.Count == 0)
+                    {
+                        this.cantResolve = true;
+                        break;
+                    }
+              
+
                 }
-                if (doSomething == false && oldNumberResolution == numberOfDots)
+                if (doSomething == false && oldNumberResolution == numberOfDots && this.cantResolve == false)
                 {
-                    GridRecursiveResolver.ResolveBlockCells(this);
+
+                    TempGrid = new CellsGrid(GridRecursiveResolver.ResolveBlockCells(this));
+                    if(TempGrid.isDone())           //Save have a different Adresse 
+                    {
+                        return TempGrid;
+                    }
                 }
             }
-            while (!this.isDone());
+            while (!this.isDone() && this.cantResolve == false);
+
+            return this;
         }
 
         
@@ -201,6 +259,38 @@ namespace Sudoku
             text.Append(Environment.NewLine);
             return text.ToString();
         }
+
+
+
+        public Cell Find(Cell cell)
+        {
+
+            foreach(Cell c in grid)
+            {
+                if (c.Equals(cell))
+                    
+                    
+                    
+                    
+                    return c;
+            }
+
+            return null;
+        }
+
+        public bool Exists(Cell cell)
+        {
+
+            foreach (Cell c in grid)
+            {
+                if (c.Equals(cell))
+                    return true;
+            }
+
+            return false;
+
+        }
+        
 
 	}
 }

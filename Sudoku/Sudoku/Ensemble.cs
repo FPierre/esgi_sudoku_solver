@@ -22,6 +22,16 @@ namespace Sudoku
             this.cellsList = new List<Cell>();
         }
 
+        public Ensemble( Ensemble e)
+        {
+            this.cellsList = new List<Cell>();
+            foreach(Cell cell in e.cellsList )
+            {
+                this.Add(cell);
+            }
+
+        }
+
 
         public void Add(Cell cell)
         {
@@ -44,14 +54,16 @@ namespace Sudoku
 
                 }
             }
-
+      
             foreach (Cell c in this.cellsList)
             {
+           
                 if (cell.hypothesis.Contains(c.value))
                 {
                     cell.hypothesis.Remove(c.value);
                 }
             }
+          
         }
         public bool ExistInEnsemble(Cell c)
         {
@@ -71,17 +83,12 @@ namespace Sudoku
             return s1 + c2 ;
         }
 
-        public static bool operator ==(Ensemble s1, Ensemble s2)
-        {
-            bool result = s1.Equals(s2);
-            return result;
-        }
 
-        public static bool operator !=(Ensemble s1, Ensemble s2)
+        public override bool Equals(object obj)
         {
-            return (!(s1 == s2));
+           
+            return base.Equals(obj);
         }
-
 
 	}
 }

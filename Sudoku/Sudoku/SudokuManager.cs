@@ -67,7 +67,7 @@ namespace Sudoku {
                         String required = file.ReadLine();
                         size = required.Length;
                         Cell[,] tableCell = new Cell[size, size];
-
+                        
                         String error = String.Empty;
                         bool isFullyOfPoint = true;
                         List<Ensemble> MesEnsembleLine = new List<Ensemble>();
@@ -132,8 +132,8 @@ namespace Sudoku {
                         {
                             this.ModelList.Add(new CellsGrid(tableCell, maListe, date, name));
                             this.ModelList.Last().numberOfDots = numberOfDots;
-                          // Console.Out.WriteLine( this.modelList.Last().ToString());
-                          // Console.ReadLine();
+                         //  Console.Out.WriteLine( this.modelList.Last().ToString());
+                          
 
                         }
 
@@ -160,7 +160,7 @@ namespace Sudoku {
 
 
                         }
-                        while (!file.EndOfStream && !line.Equals(this.delimiter));
+                        while (!file.EndOfStream && !line[0].Equals(this.delimiter[0]));
 
 
                        

@@ -35,7 +35,7 @@ namespace Sudoku
 			this.listLine = listLine;
 			this.listSector = listSector;
 			this.value = value;
-			this.hypothesis = hypothesis;
+			this.hypothesis = new List<String>(hypothesis);
 		}
 
 		private Cell (String value,List<String> hypothesis)
@@ -55,10 +55,6 @@ namespace Sudoku
 
         }
 
-        public Cell(Cell cell) : this(cell.value,cell.hypothesis)
-        {
-
-        }
 
 		public bool ExistsInEnsemble(params Ensemble[] t)
 		{
@@ -156,9 +152,17 @@ namespace Sudoku
                 return true;
 
             return false;
+        }
 
-        
 
+        public override bool Equals(object obj)
+        {
+            if(obj is Cell)
+            {
+                Cell c = obj as Cell;
+                return c.value.Equals(this.value) && c.hypothesis.SequenceEqual(this.hypothesis);
+            }
+            return base.Equals(obj);
         }
     }
 }
