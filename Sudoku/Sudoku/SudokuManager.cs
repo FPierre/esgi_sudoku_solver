@@ -87,7 +87,7 @@ namespace Sudoku {
                                 double sqrtNumber = Math.Sqrt((Convert.ToDouble(size)));
                                 int indexSector = ((int)(Math.Floor(i / sqrtNumber) * sqrtNumber + Math.Floor(j / sqrtNumber)));
                                 verifyEnsemble(MesEnsembleSector, indexSector);
-                                myCell = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], tempLine[j], new List<String>(Utility.SplitWithSeparatorEmpty(required))); ;
+                                myCell = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], tempLine[j], new List<String>(Utility.SplitWithSeparatorEmpty(required)) , i , j); ;
 
 
 

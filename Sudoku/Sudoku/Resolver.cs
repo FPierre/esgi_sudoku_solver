@@ -116,7 +116,7 @@ namespace Sudoku
                         if(cellTable[j].existInEnsembleOf(cellTable[K]))
                         {
                             result.Add(cellTable[j]);
-                            result.Add(cellTable[K]);
+                            //result.Add(cellTable[K]);
                             doSomething = true;
                         }
 
@@ -129,7 +129,6 @@ namespace Sudoku
                     }
 
                 }
-
                 i++;
             }
             while ( i < list.Count && doSomething == false );
@@ -138,15 +137,27 @@ namespace Sudoku
             return result;
         }
 
+
+
+
+
         public  CellsGrid ResolveBlockCells(CellsGrid grid)
         {
              
             Dictionary<string, List<Cell>> counter = this.counBlockCells(grid);
             List<KeyValuePair<string, List<Cell>>> sortedCells =this.sortedBlockCells(counter);
-            
-            
+
+            CellsGrid tempgrid = new CellsGrid(grid);
             List<Cell> blockCells = this.getBlockCells(sortedCells);
-            
+            List<CellsGrid> testList = new List<CellsGrid>();
+            testList.Add(tempgrid);
+            Console.Out.WriteLine("cellule bloquante");
+            foreach(Cell c in blockCells)
+            {
+                Console.Out.WriteLine(c.hypothesis.Aggregate((stringa,stringb) => stringa + stringb));
+                Console.Out.WriteLine(String.Format("({0},{1})", c.PosX, c.PosY));
+               // Console.ReadLine();
+            }
             if(blockCells.Count == 0)
             {
                 if (this.listHypotheticSudoku.Count > 0)
@@ -159,54 +170,63 @@ namespace Sudoku
             else
             {
 
-
-                CellsGrid tempgrid = new CellsGrid(grid);
-                this.listHypotheticSudoku.Add(tempgrid);
-
-                List<CellsGrid> testList = new List<CellsGrid>();
-                testList.Add(tempgrid);
-               List<String> temp = new List<String>(blockCells.First().hypothesis);
               
-               foreach (String Hypothesis in temp)
-               {
-                   
-                   if(grid.Exists( blockCells.First()))
+ 
+                for(int i = 0 ; i < blockCells.Count ; i++ )
+                {
+                    var cell = blockCells[i];
+                    List<String> temp = new List<String>(cell.hypothesis);
+                    testList.Last().cantResolve = false;
+                   // testList.Add(tempgrid);
+                    foreach (String Hypothesis in temp)
                    {
 
-                       Cell realCell = grid.Find(blockCells.First());
-                       Cell tempCell = realCell;
-                       Console.WriteLine("test value {0}", Hypothesis);
-                       if(realCell == null)
-                        Console.WriteLine("cell is null");
-                       realCell.value = Hypothesis;
-                      // realCell.value = Hypothesis;
-                       realCell.diffuseInItsEnsemble();
 
-                       Console.Out.WriteLine(grid);
-                        grid = grid.resolveGrid();
-                       if (grid.isDone())
-                           break;
-                       if(grid.cantResolve == true)
-                       {
-                           grid = testList.Last();
-                           //this.listHypotheticSudoku.Remove(this.listHypotheticSudoku.Last());
+                       testList.Add(new CellsGrid(testList.First()));
+                       Cell realCell = testList.Last()[cell.PosX, cell.PosY];
+                       if (cell.PosX == 1 && cell.PosY == 7 && Hypothesis.Equals("4"))
+                           Console.Out.WriteLine("autreChemin");
+                       testList.Last().cantResolve = false;
 
-                          counter = this.counBlockCells(grid);
-                          sortedCells = this.sortedBlockCells(counter);
+                        Console.WriteLine("test value {0} at  ({1},{2})", Hypothesis,realCell.PosX,realCell.PosY);
+                           if (realCell == null)
+                               Console.WriteLine("cell is null");
+                           realCell.value = Hypothesis;
+                           realCell.diffuseInItsEnsemble();
+                           Console.Out.WriteLine(testList.Last());
+                        grid = testList.Last().resolveGrid();
 
+                        if (grid.isDone())
+                        {
+                            Console.WriteLine("Resolve");
+                            Console.ReadLine();
+                            return grid;
 
-                           blockCells = this.getBlockCells(sortedCells);
-                           Console.Out.WriteLine("RollBack");
-                            Console.Out.WriteLine(grid);
-                           
-                           //realCell = tempCell;
-                       }
-                   }
-                  
-               }
-               if (!grid.isDone())
-                   grid.cantResolve = true;
+                        }
+                            if (testList.Last().cantResolve == true)
+                           {
+                               testList.Remove(testList.Last());
+                               testList.Last().cantResolve = true;
+                               //this.listHypotheticSudoku.Remove(this.listHypotheticSudoku.Last());
+                               Console.Out.WriteLine("RollBack");
+                                Console.Out.WriteLine(testList.Last());
+                              //  Console.In.ReadLine();
+                              //  Console.In.ReadLine();
+                               //realCell = tempCell;
+                           }  
+                        }
+
+                    testList.Last().cantResolve = true;
+              }
+           }
+            if (!grid.isDone())
+            {
+                
+                grid = testList.First();
+                grid.cantResolve = true;
+
             }
+
 
             return grid;
         }

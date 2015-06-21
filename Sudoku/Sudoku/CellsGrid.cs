@@ -123,7 +123,7 @@ namespace Sudoku
                     {
                         MesEnsembleSector.Add(new Ensemble());
                     }
-                   this.grid[i,j] = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], cellsgrid.grid[i, j].value, cellsgrid.grid[i,j].hypothesis );
+                   this.grid[i,j] = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], cellsgrid.grid[i, j].value, cellsgrid.grid[i,j].hypothesis,i,j );
                     this.grid[i,j].addItsEnsemble();
                 }
             }
@@ -160,13 +160,14 @@ namespace Sudoku
                         doSomething = true;
                         numberOfDots--;
                         Console.WriteLine(this);
-                        Console.ReadLine();
+//                        Console.ReadLine();
                     }
 
                     if(c.value.Equals(".") && c.hypothesis.Count == 0)
                     {
+
                         this.cantResolve = true;
-                        break;
+                        return this;
                     }
               
 
@@ -174,16 +175,21 @@ namespace Sudoku
                 if (doSomething == false && oldNumberResolution == numberOfDots && this.cantResolve == false)
                 {
 
+                    
                     TempGrid = new CellsGrid(GridRecursiveResolver.ResolveBlockCells(this));
                     if(TempGrid.isDone())           //Save have a different Adresse 
                     {
                         return TempGrid;
                     }
+                    if(TempGrid.cantResolve == true)
+                    {
+                        return TempGrid;
+                    }
                 }
             }
-            while (!this.isDone() && this.cantResolve == false);
+            while (!this.isDone() && TempGrid.cantResolve == false);
+           return this;
 
-            return this;
         }
 
         
@@ -262,29 +268,32 @@ namespace Sudoku
 
 
 
-        public Cell Find(Cell cell)
+        public Cell Find(Cell cell , int pos)
         {
-
+            int nbr = pos + 1;
             foreach(Cell c in grid)
             {
                 if (c.Equals(cell))
-                    
-                    
-                    
-                    
-                    return c;
+                    nbr--;
+                    if (nbr == 0)
+                        return c;
             }
 
             return null;
         }
 
-        public bool Exists(Cell cell)
+        public bool Exists(Cell cell , int i)
         {
-
+            int nbr = i + 1;
             foreach (Cell c in grid)
             {
                 if (c.Equals(cell))
-                    return true;
+                {
+                    nbr--;
+                    if(nbr == 0)
+                        return true;
+                }
+                    
             }
 
             return false;

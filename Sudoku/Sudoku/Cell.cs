@@ -28,14 +28,19 @@ namespace Sudoku
 		protected internal List<String> hypothesis;
         protected internal String value;
 
+        internal int PosX;
+        internal int PosY;
 
-		public Cell (Ensemble listColumn , Ensemble listLine , Ensemble listSector,String value,List<String> hypothesis)
+
+		public Cell (Ensemble listColumn , Ensemble listLine , Ensemble listSector,String value,List<String> hypothesis , int posx , int posy)
 		{
 			this.listColumn = listColumn;
 			this.listLine = listLine;
 			this.listSector = listSector;
 			this.value = value;
 			this.hypothesis = new List<String>(hypothesis);
+            this.PosX = posx;
+            this.PosY = posy;
 		}
 
 		private Cell (String value,List<String> hypothesis)
