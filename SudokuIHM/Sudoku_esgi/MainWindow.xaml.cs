@@ -28,9 +28,13 @@ namespace Sudoku_esgi {
             ActionSudoku.Content = "Validation";
         }
 
-        private void StepByStepUnchecked(object sender, RoutedEventArgs e) { }
+        private void StepByStepUnchecked(object sender, RoutedEventArgs e) {
+            ActionStep.Visibility = Visibility.Hidden;
+        }
 
-        private void StepByStepChecked(object sender, RoutedEventArgs e) { }
+        private void StepByStepChecked(object sender, RoutedEventArgs e) {
+            ActionStep.Visibility = Visibility.Visible;
+        }
 
         private void SelectModeChanged(object sender, SelectionChangedEventArgs e) {
             ComboBoxItem selectedMode = (ComboBoxItem) SelectMode.SelectedItem;
@@ -82,6 +86,10 @@ namespace Sudoku_esgi {
 
         private void TreatSudoku(object sender, RoutedEventArgs e) {
             // Traitement sur la grille
+        }
+
+        private void GoNextStep(object sender, RoutedEventArgs e) {
+            // Traitement step-by-step
         }
     }
 }
