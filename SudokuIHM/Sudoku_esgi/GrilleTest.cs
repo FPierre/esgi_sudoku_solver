@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Sudoku_esgi {
     public class GridTest {
         public string Name { get; set; }
-        public DateTime Date { get; set; }
+        public string Date { get; set; }
         public string Required { get; set; }
         public int Size { get { return Required.Length; } }
         public CaseTest[,] Tab { get; set; }
@@ -29,5 +29,8 @@ namespace Sudoku_esgi {
             }
         }
 
+        public override string ToString() {
+            return String.Format("{0} ({1})", Name, Date);
+        }
     }
 }

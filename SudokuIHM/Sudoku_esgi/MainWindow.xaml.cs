@@ -19,6 +19,13 @@ namespace Sudoku_esgi {
         public MainWindow() {
             InitializeComponent();
             DataContext = App.SudokuManager;
+
+            // Initialise l'IHM
+            initIHM();
+        }
+
+        private void initIHM() {
+            ActionSudoku.Content = "Validation";
         }
 
         private void StepByStepUnchecked(object sender, RoutedEventArgs e) { }
