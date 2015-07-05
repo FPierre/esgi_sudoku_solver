@@ -74,7 +74,7 @@ namespace Sudoku {
                     {
                         String name = file.ReadLine();
 
-                        this.Log(ModeText.Warning, name, false);
+                        this.Log(ModeText.Warning, name);
 
 
                         String date = file.ReadLine();
@@ -153,7 +153,7 @@ namespace Sudoku {
                         if (!error.Equals(String.Empty))
                         {
                             this.modelList.Last().isValid = false;
-                            this.Log(ModeText.Warning, error, true);
+                            this.Log(ModeText.Warning, error);
                             getError = true;
 
                         }
@@ -162,7 +162,7 @@ namespace Sudoku {
                         {
                             this.modelList.Last().isValid = false;
                             error = "(format non supporté, devrait être 9x9, 16x16 ou 25x25).";
-                            this.Log(ModeText.Warning, error, true);
+                            this.Log(ModeText.Warning, error);
                             this.modelList.Last().error += error;
                         }
                         else
@@ -172,7 +172,7 @@ namespace Sudoku {
                             {
                                 this.modelList.Last().isValid = false;
                                 error = "c'est une grille de point.";
-                                this.Log(ModeText.Warning, error, true);
+                                this.Log(ModeText.Warning, error);
                                 this.modelList.Last().error += error;
                             }
                             else
@@ -194,7 +194,7 @@ namespace Sudoku {
                         }
                         while (!file.EndOfStream && !line[0].Equals(this.delimiter[0]));
 
-                        this.Log(ModeText.Warning, "next Sudoku", false);
+                        this.Log(ModeText.Warning, "next Sudoku");
                     }
                     while (!file.EndOfStream );
             
@@ -227,22 +227,22 @@ namespace Sudoku {
                     if (modelList[i].isDone())
                     {
                         
-                        this.Log(ModeText.Verbose, "Le sudoku est résolu", false);
-                        this.Log(ModeText.Verbose, modelList[i].ToString(), true);
+                        this.Log(ModeText.Verbose, "Le sudoku est résolu");
+                        this.Log(ModeText.Verbose, modelList[i].ToString());
 
                     }
                     else
                     {
-                        this.Log(ModeText.Verbose, "Le sudoku est non résolu", false);
-                        this.Log(ModeText.Verbose, modelList[i].ToString(), true);
+                        this.Log(ModeText.Verbose, "Le sudoku est non résolu");
+                        this.Log(ModeText.Verbose, modelList[i].ToString());
                     }
                 }
                 else
                 {
                     
                     String text =  String.Format("Sudoku {0} is invalid ",modelList[i].name);
-                    this.Log(ModeText.Verbose, text, false);
-                    this.Log(ModeText.Verbose,  modelList[i].error, false);
+                    this.Log(ModeText.Verbose, text);
+                    this.Log(ModeText.Verbose,  modelList[i].error);
                  
                 }
             }

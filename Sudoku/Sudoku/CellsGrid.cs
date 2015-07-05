@@ -166,8 +166,8 @@ namespace Sudoku
                     {
 
                         c.Value = c.hypothesis.First();
-                        this.Log(ModeText.Verbose, String.Format("Add value {0} at [{1},{2}]",c.Value, c.PosX ,c.PosY), false);
-                        this.Log(ModeText.Verbose, String.Format("Diffuse in all Ensemble the value",c.Value, c.PosX ,c.PosY), false);
+                        this.Log(ModeText.Verbose, String.Format("Add value {0} at [{1},{2}]",c.Value, c.PosX ,c.PosY));
+                        this.Log(ModeText.Verbose, String.Format("Diffuse in all Ensemble the value",c.Value, c.PosX ,c.PosY));
 
                         c.diffuseInItsEnsemble();
                         doSomething = true;
@@ -251,7 +251,7 @@ namespace Sudoku
                         
                         error = String.Format("grille : {3} {4}la cellule à l'index {0},{1} a une valeur semblable dans sa ligne, dans sa colonne ou dans son secteur", i, j,this.name,Environment.NewLine);
 
-                        this.Log(ModeText.Error, error, false);
+                        this.Log(ModeText.Error, error);
 
                         this.isValid = false;
                         break;

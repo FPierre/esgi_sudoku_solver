@@ -47,13 +47,10 @@ namespace Sudoku
         }
 
 
-        public void Log(ModeText level,String text ,bool stepByStep )
+        public void Log(ModeText level,String text )
         {
-            bool ReadingMode = ConsoleMenu.StepByStep;
-            ConsoleMenu.StepByStep = stepByStep;
             lastTextLogLevel = level;
             TextLog = text;
-            ConsoleMenu.StepByStep = ReadingMode;
         }
 
     }

@@ -42,7 +42,7 @@ namespace Sudoku
                 if( this.hypothesis != null &&this.hypothesis.Count > 0 && !value.Equals("."))
                     this.hypothesis.RemoveRange(0,this.hypothesis.Count);
 
-                    this.Log(ModeText.Verbose, this.ToString(), false);
+                    this.Log(ModeText.Verbose, this.ToString());
             }
         }
 

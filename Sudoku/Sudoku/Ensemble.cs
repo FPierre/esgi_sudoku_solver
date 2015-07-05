@@ -56,7 +56,7 @@ namespace Sudoku
                 List<Cell> tempCel = this.cellsList.FindAll(c => c.hypothesis.Contains(cell.Value));
                 if (tempCel.Count != 0)
                 {
-                    this.Log(ModeText.Verbose,  String.Format("Remove Hypothesis {0}",cell.Value),false);
+                    this.Log(ModeText.Verbose,  String.Format("Remove Hypothesis {0}",cell.Value));
                     tempCel.ForEach(c =>RemoveValueFromHypothesis(cell,c) );
                     
                 }
@@ -79,7 +79,7 @@ namespace Sudoku
         {
             c.hypothesis.Remove(cellWithValue.Value);
 
-            this.Log(ModeText.Verbose,c.ToString(), false);
+            this.Log(ModeText.Verbose,c.ToString());
         }
         public bool ExistInEnsemble(Cell c)
         {
@@ -93,9 +93,9 @@ namespace Sudoku
         {
             if(cell.Value.Equals(cell2.Value))
             {
-                Log(ModeText.Error, "Deux cellules ont la même valeur", false);
-                Log(ModeText.Error, cell.ToString(), false);
-                Log(ModeText.Error, cell2.ToString(), true);
+                Log(ModeText.Error, "Deux cellules ont la même valeur");
+                Log(ModeText.Error, cell.ToString());
+                Log(ModeText.Error, cell2.ToString());
                 return true;
             }
             return false;

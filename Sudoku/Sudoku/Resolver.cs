@@ -123,10 +123,10 @@ namespace Sudoku
                     }
                     if( i == (list.Count - 1 ) && doSomething == false)
                     {
-                        TextLog = "Aucune Solution trouvé ";
-                        
+                        Log(ModeText.Error, "Aucune Solution trouvé");
 
-                         TextLog ="Retour à la version précédente si existe";
+                        Log(ModeText.Error, "Retour à la version précédente si existe");
+
                         doSomething = true;
                     }
 
@@ -183,13 +183,15 @@ namespace Sudoku
             List<CellsGrid> testList = new List<CellsGrid>();
             testList.Add(grid);
             testList.Add(new CellsGrid(grid));
-            TextLog = "Save last version";
+            Log(ModeText.Verbose, "Save last version");
+
             Dictionary<string, List<Cell>> counter = this.counBlockCells(testList.Last());
             List<KeyValuePair<string, List<Cell>>> sortedCells =this.sortedBlockCells(counter);
 
             List<Cell> blockCells = this.getBlockCells(sortedCells);
 
-            TextLog = "cellule bloquante";
+
+            Log(ModeText.Verbose, "cellule bloquante");
             foreach(Cell c in blockCells)
             {
                 Console.Out.WriteLine(c.hypothesis.Aggregate((stringa,stringb) => stringa + stringb));
@@ -237,8 +239,7 @@ namespace Sudoku
                        TextLog = String.Format("test value {0} at  ({1},{2})", Hypothesis,realCell.PosX,realCell.PosY);
                        if (realCell == null)
                        {
-                           lastTextLogLevel = ModeText.Error;
-                           TextLog = "cell is null"; 
+                           Log(ModeText.Error,"cell is null");
                        }
                            realCell.Value = Hypothesis;
                            realCell.diffuseInItsEnsemble();
@@ -260,8 +261,8 @@ namespace Sudoku
                                testList.Last().cantResolve = true;
                                //this.listHypotheticSudoku.Remove(this.listHypotheticSudoku.Last());
 
-                               lastTextLogLevel = ModeText.Verbose;
-                               TextLog = "RollBack";
+ 
+                               Log(ModeText.Verbose, "RollBack");
                                // Console.Out.WriteLine(testList.Last());
                                 
  
