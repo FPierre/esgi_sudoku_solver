@@ -7,9 +7,9 @@ using System.Threading.Tasks;
 namespace Sudoku
 {
     
-    public class SudokuInterface
+    public class SudokuObject
     {
-        protected List<IObserver<SudokuInterface>> observers;
+        protected List<IObserver<SudokuObject>> observers;
         private String textLog_;
    
        protected internal String TextLog
@@ -28,11 +28,11 @@ namespace Sudoku
        protected internal ModeText lastTextLogLevel;
 
 
-        public SudokuInterface()
+        public SudokuObject()
         {
-            observers = new List<IObserver<SudokuInterface>>();
+            observers = new List<IObserver<SudokuObject>>();
         }
-        public IDisposable Subscribe(IObserver<SudokuInterface> observer)
+        public IDisposable Subscribe(IObserver<SudokuObject> observer)
         {
             if (!observers.Contains(observer))
             {
@@ -57,10 +57,10 @@ namespace Sudoku
 
     internal class Unsubscriber<ConsoleMenu> : IDisposable
     {
-        private List<IObserver<SudokuInterface>> _observers;
-        private IObserver<SudokuInterface> _observer;
+        private List<IObserver<SudokuObject>> _observers;
+        private IObserver<SudokuObject> _observer;
 
-        internal Unsubscriber(List<IObserver<SudokuInterface>> observers, IObserver<SudokuInterface> observer)
+        internal Unsubscriber(List<IObserver<SudokuObject>> observers, IObserver<SudokuObject> observer)
         {
             this._observers = observers;
             this._observer = observer;

@@ -53,9 +53,10 @@
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
     <Compile Include="Resolver.cs" />
-    <Compile Include="SudokuInterface.cs" />
+    <Compile Include="SudokuObject.cs" />
     <Compile Include="SudokuManager.cs" />
     <Compile Include="Utility.cs" />
+    <Compile Include="ViewInterface.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />

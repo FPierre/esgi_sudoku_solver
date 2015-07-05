@@ -5,7 +5,7 @@ using System.IO;
 using System.Text;
 
 namespace Sudoku {
-     public class SudokuManager :  SudokuInterface,  IObservable<SudokuInterface> {
+     public class SudokuManager :  SudokuObject,  IObservable<SudokuObject> {
         private string path;
         private string delimiter;
         private int mode;
@@ -19,7 +19,7 @@ namespace Sudoku {
          * @param (string) delimiter = Chaîne de caractères de séparation des sudokus (optionnel)
          * @param (int) mode = Mode du manager 0 = validation, 1 = résolution (optionnel)
          **/
-        public SudokuManager(string path,IObserver<SudokuInterface> MainConsole, int mode = 0 ) : base() {
+        public SudokuManager(string path,IObserver<SudokuObject> MainConsole, int mode = 0 ) : base() {
             this.Path = path;
      
             this.ModelList = new List<CellsGrid>();
@@ -221,30 +221,7 @@ namespace Sudoku {
 
             for(int i = 0; i < modelList.Count ; i++)
             {
-                if (modelList[i].isValid)
-                {
-                    modelList[i] = modelList[i].resolveGrid();
-                    if (modelList[i].isDone())
-                    {
-                        
-                        this.Log(ModeText.Verbose, "Le sudoku est résolu");
-                        this.Log(ModeText.Verbose, modelList[i].ToString());
-
-                    }
-                    else
-                    {
-                        this.Log(ModeText.Verbose, "Le sudoku est non résolu");
-                        this.Log(ModeText.Verbose, modelList[i].ToString());
-                    }
-                }
-                else
-                {
-                    
-                    String text =  String.Format("Sudoku {0} is invalid ",modelList[i].name);
-                    this.Log(ModeText.Verbose, text);
-                    this.Log(ModeText.Verbose,  modelList[i].error);
-                 
-                }
+                resolve(i);
             }
 
                 
@@ -317,5 +294,76 @@ namespace Sudoku {
  */
 
 
-    }
+
+        internal int displayNames()
+        {
+            int filter = 50;
+            int i = 1;
+            
+            foreach(CellsGrid grid in ModelList)
+            {
+                Console.Out.WriteLine("-{0}       {1}", i, grid.name);
+                i++;
+                if (i % filter == 0)
+                {
+                    int intChoice = -1;
+                    while (intChoice < 1  || intChoice >= this.ModelList.Count)
+                    {
+                        
+                        String text = Console.ReadLine();
+                        if (!String.IsNullOrEmpty(text) && !text.Equals(Environment.NewLine))
+                        {
+                            try
+                            {
+                                intChoice = Convert.ToInt32(text);
+                                intChoice--;
+                                return intChoice;
+                            }
+                            catch (Exception e)
+                            {
+                                Console.WriteLine("Rentrer un nombre");
+                                intChoice = -1;
+                            }
+
+                        }
+                        else
+                        {
+                            break;
+                        }
+                    }
+                }
+               
+            }
+            return -1;
+        }
+
+
+        internal void resolve(int choiceSudokuu)
+        {
+            if (modelList[choiceSudokuu].isValid)
+            {
+                modelList[choiceSudokuu] = modelList[choiceSudokuu].resolveGrid();
+                if (modelList[choiceSudokuu].isDone())
+                {
+
+                    this.Log(ModeText.Verbose, "Le sudoku est résolu");
+                    this.Log(ModeText.Verbose, modelList[choiceSudokuu].ToString());
+
+                }
+                else
+                {
+                    this.Log(ModeText.Verbose, "Le sudoku est non résolu");
+                    this.Log(ModeText.Verbose, modelList[choiceSudokuu].ToString());
+                }
+            }
+            else
+            {
+
+                String text = String.Format("Sudoku {0} is invalid ", modelList[choiceSudokuu].name);
+                this.Log(ModeText.Verbose, text);
+                this.Log(ModeText.Verbose, modelList[choiceSudokuu].error);
+
+            }
+        }
+     }
 }

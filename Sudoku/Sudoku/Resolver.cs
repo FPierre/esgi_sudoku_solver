@@ -7,7 +7,7 @@ namespace Sudoku
 
      
 
-	public class Resolver :  SudokuInterface, IObservable<SudokuInterface>
+	public class Resolver :  SudokuObject, IObservable<SudokuObject>
 	{
 		public List<CellsGrid> listHypotheticSudoku;
 		public int index = 0;

@@ -8,22 +8,22 @@ using System.Linq.Expressions;
 
 namespace Sudoku
 {
-    public class Ensemble : SudokuInterface, IObservable<SudokuInterface>
+    public class Ensemble : SudokuObject, IObservable<SudokuObject>
 	{
        
 
 		protected internal List<Cell> cellsList
 		{ get; set; }
-        public Ensemble(List<Cell> cellsList, List<IObserver<SudokuInterface>> MainConsole) :base()
+        public Ensemble(List<Cell> cellsList, List<IObserver<SudokuObject>> MainConsole) :base()
 		{
             this.cellsList = new List<Cell>();
-            foreach (IObserver<SudokuInterface> observer in MainConsole)
+            foreach (IObserver<SudokuObject> observer in MainConsole)
             {
                 this.observers.Add(observer);
             }
 		}
 
-        public Ensemble(List<IObserver<SudokuInterface>> MainConsole)
+        public Ensemble(List<IObserver<SudokuObject>> MainConsole)
             : this(new List<Cell>(),MainConsole)
         { 
         }

@@ -7,14 +7,12 @@ using System.Threading.Tasks;
 namespace Sudoku
 {
     public enum ModeText { Verbose, Warning, Error };
-    public class ConsoleMenu : IObserver<SudokuInterface>
+    public class ConsoleMenu : ViewObject,IObserver<SudokuObject> 
     {
-        public static bool StepByStep = false;
-        public static ModeText mode = ModeText.Warning;
+
         private  String choice;
         public  SudokuManager manager;
         private  bool managerIsOn = false;
-        StringBuilder result;
         public ConsoleMenu() : base()
         {
             result = new StringBuilder();  
@@ -60,7 +58,18 @@ namespace Sudoku
                     if(managerIsOn == false)
                         manager = new SudokuManager(Properties.Resources.testSudoku,this);
                     ConsoleMenu.mode = ModeText.Verbose;
-                    manager.resolveAll();
+                    int choiceSudokuu = this.chooseSudoku();
+
+                    if (choiceSudokuu < 0)
+                    {
+                        Console.WriteLine("Vous n'avez riens choisis");
+                        return;
+                    }
+                    else
+                    {
+                        manager.resolve(choiceSudokuu);
+                    }
+                    
                     break;
                 case "3":
                     result.Append("–> Bye bye ! ");
@@ -91,7 +100,7 @@ namespace Sudoku
 
 
         // The observable invokes this method to pass the Subject object to the observer
-        public void OnNext(SudokuInterface currentObject)
+        public void OnNext(SudokuObject currentObject)
         {
             if (ConsoleMenu.mode <= currentObject.lastTextLogLevel)
             {
@@ -116,6 +125,19 @@ namespace Sudoku
         public void OnError(Exception error)
         {
             throw new NotImplementedException();
+        }
+
+
+        public int chooseSudoku()
+        {
+
+            Console.WriteLine("Choissisez quel sudoku vous voullez resoudre");
+            int choice = this.manager.displayNames();
+            
+                
+            
+            return choice;
+            
         }
 
 

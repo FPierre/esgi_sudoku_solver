@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sudoku
 {
-    public class CellsGrid : SudokuInterface, IObservable<SudokuInterface> 
+    public class CellsGrid : SudokuObject, IObservable<SudokuObject> 
 	{
        // private static string gridDelimiter = @"//---------------------------";
 
@@ -76,7 +76,7 @@ namespace Sudoku
 
 
 
-        public CellsGrid(Cell[,] value, List<String> defaultValues, List<IObserver<SudokuInterface>> MainConsole)
+        public CellsGrid(Cell[,] value, List<String> defaultValues, List<IObserver<SudokuObject>> MainConsole)
             : this(MainConsole) 
 		{
             GridRecursiveResolver = new Resolver();
@@ -131,7 +131,7 @@ namespace Sudoku
             }
         }
 
-        public CellsGrid(Cell[,] value, List<String> defaultValues, String date, String name, List<IObserver<SudokuInterface>> MainConsole)
+        public CellsGrid(Cell[,] value, List<String> defaultValues, String date, String name, List<IObserver<SudokuObject>> MainConsole)
             : this(value, defaultValues, MainConsole)  
         {
 
@@ -139,10 +139,10 @@ namespace Sudoku
             this.name = name;
         }
 
-        private CellsGrid(List<IObserver<SudokuInterface>> MainConsole)
+        private CellsGrid(List<IObserver<SudokuObject>> MainConsole)
             : base()
         {
-            foreach(IObserver<SudokuInterface> observer in MainConsole )
+            foreach(IObserver<SudokuObject> observer in MainConsole )
             {
                 this.observers.Add(observer);
             }

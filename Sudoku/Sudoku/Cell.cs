@@ -7,7 +7,7 @@ using System.Text;
 
 namespace Sudoku
 {
-	public class Cell : SudokuInterface, IObservable<SudokuInterface>
+	public class Cell : SudokuObject, IObservable<SudokuObject>
 	{
 
         protected internal Ensemble listColumn
@@ -49,16 +49,16 @@ namespace Sudoku
         internal int PosX;
         internal int PosY;
 
-        protected Cell(List<IObserver<SudokuInterface>> MainConsole)
+        protected Cell(List<IObserver<SudokuObject>> MainConsole)
             : base()
         {
-            foreach (IObserver<SudokuInterface> observer in MainConsole)
+            foreach (IObserver<SudokuObject> observer in MainConsole)
             {
                 this.observers.Add(observer);
             }
         }
 
-        public Cell(Ensemble listColumn, Ensemble listLine, Ensemble listSector, String value, List<String> hypothesis, int posx, int posy, List<IObserver<SudokuInterface>> MainConsole)
+        public Cell(Ensemble listColumn, Ensemble listLine, Ensemble listSector, String value, List<String> hypothesis, int posx, int posy, List<IObserver<SudokuObject>> MainConsole)
             : this( MainConsole)
 		{
   
@@ -74,10 +74,10 @@ namespace Sudoku
             
 		}
 
-        private Cell(String value, List<String> hypothesis,List<IObserver<SudokuInterface>> MainConsole)
+        private Cell(String value, List<String> hypothesis,List<IObserver<SudokuObject>> MainConsole)
             : base()
 		{
-            foreach(IObserver<SudokuInterface> observer in MainConsole)
+            foreach(IObserver<SudokuObject> observer in MainConsole)
             {
                 base.Subscribe(observer);
             }
@@ -86,7 +86,7 @@ namespace Sudoku
             this.hypothesis = hypothesis;
 		}
 
-        private Cell(String value, String hypothesis, List<IObserver<SudokuInterface>> MainConsole)
+        private Cell(String value, String hypothesis, List<IObserver<SudokuObject>> MainConsole)
             : this(value,new List<String>(Utility.SplitWithSeparatorEmpty(hypothesis)),MainConsole)
         {
    
@@ -94,7 +94,7 @@ namespace Sudoku
 
     
 
-        private Cell(Cell cell, string hypothesis, IObserver<SudokuInterface> MainConsole) : this(cell.Value,new List<String>(Utility.SplitWithSeparatorEmpty(hypothesis)),cell.observers)
+        private Cell(Cell cell, string hypothesis, IObserver<SudokuObject> MainConsole) : this(cell.Value,new List<String>(Utility.SplitWithSeparatorEmpty(hypothesis)),cell.observers)
         {
 
         }
