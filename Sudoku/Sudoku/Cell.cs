@@ -2,11 +2,12 @@
 using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
+using System.Text;
 
 
 namespace Sudoku
 {
-	public class Cell
+	public class Cell : SudokuInterface, IObservable<SudokuInterface>
 	{
 
         protected internal Ensemble listColumn
@@ -26,36 +27,74 @@ namespace Sudoku
         }
 
 		protected internal List<String> hypothesis;
-        protected internal String value;
+        private String _value;
+        protected internal String Value
+        {
+
+            get
+            {
+                return this._value;
+
+            }
+            set
+            {
+                this._value = value;
+                if( this.hypothesis != null &&this.hypothesis.Count > 0 && !value.Equals("."))
+                    this.hypothesis.RemoveRange(0,this.hypothesis.Count);
+
+                    this.Log(ModeText.Verbose, this.ToString(), false);
+            }
+        }
 
         internal int PosX;
         internal int PosY;
 
+        protected Cell(List<IObserver<SudokuInterface>> MainConsole)
+            : base()
+        {
+            foreach (IObserver<SudokuInterface> observer in MainConsole)
+            {
+                this.observers.Add(observer);
+            }
+        }
 
-		public Cell (Ensemble listColumn , Ensemble listLine , Ensemble listSector,String value,List<String> hypothesis , int posx , int posy)
+        public Cell(Ensemble listColumn, Ensemble listLine, Ensemble listSector, String value, List<String> hypothesis, int posx, int posy, List<IObserver<SudokuInterface>> MainConsole)
+            : this( MainConsole)
 		{
+  
 			this.listColumn = listColumn;
 			this.listLine = listLine;
 			this.listSector = listSector;
-			this.value = value;
+			
 			this.hypothesis = new List<String>(hypothesis);
             this.PosX = posx;
             this.PosY = posy;
+            this.Value = value;
+            
+            
 		}
 
-		private Cell (String value,List<String> hypothesis)
+        private Cell(String value, List<String> hypothesis,List<IObserver<SudokuInterface>> MainConsole)
+            : base()
 		{
-            this.value = value;
+            foreach(IObserver<SudokuInterface> observer in MainConsole)
+            {
+                base.Subscribe(observer);
+            }
+            
+            this.Value = value;
             this.hypothesis = hypothesis;
 		}
 
-        private Cell(String value, String hypothesis)
-            : this(value,new List<String>(Utility.SplitWithSeparatorEmpty(hypothesis)))
+        private Cell(String value, String hypothesis, List<IObserver<SudokuInterface>> MainConsole)
+            : this(value,new List<String>(Utility.SplitWithSeparatorEmpty(hypothesis)),MainConsole)
         {
    
         }
 
-        private Cell(Cell cell, string hypothesis) : this(cell.value,new List<String>(Utility.SplitWithSeparatorEmpty(hypothesis)))
+    
+
+        private Cell(Cell cell, string hypothesis, IObserver<SudokuInterface> MainConsole) : this(cell.Value,new List<String>(Utility.SplitWithSeparatorEmpty(hypothesis)),cell.observers)
         {
 
         }
@@ -67,8 +106,12 @@ namespace Sudoku
             int i = 0;
             while(i < t.Length && exists == false)
             {
-                if(t[i].ExistInEnsemble(this))
+                if (t[i].ExistInEnsemble(this))
+                {
                     exists = true;
+                    break;
+                    
+                }
 	             i++;
             }
             return exists;	
@@ -125,13 +168,13 @@ namespace Sudoku
 
         public bool ValuesIsNull()
         {
-            return this.value.Equals(".");
+            return this.Value.Equals(".");
         }
 
         public bool ExistsInEnsemble( int value)
         {
 
-            Cell tempCell = new Cell(Convert.ToString(value),new List<string>());
+            Cell tempCell = new Cell(Convert.ToString(value),new List<string>(),this.observers);
             List<Ensemble> TempListEnsemble = new List<Ensemble>();
             TempListEnsemble.Add(this.listColumn);
             TempListEnsemble.Add(this.listLine);
@@ -162,13 +205,22 @@ namespace Sudoku
 
         public override bool Equals(object obj)
         {
-            if(obj is Cell)
-            {
-                Cell c = obj as Cell;
-                return c.value.Equals(this.value) && c.hypothesis.SequenceEqual(this.hypothesis);
-            }
+          
             return base.Equals(obj);
         }
+
+        public override string ToString()
+        {
+            StringBuilder result = new StringBuilder();
+            result.AppendFormat(" Value : {0} {1}",this.Value, Environment.NewLine);
+            if(hypothesis.Count > 0)
+                result.AppendFormat(" Hypothesis : {0} {1}", this.hypothesis.Aggregate((stringa, stringb) => stringa + stringb),Environment.NewLine);
+            result.AppendFormat(" Pos : [{0},{1}] {2}", this.PosX, this.PosY, Environment.NewLine);
+
+            return result.ToString();
+        }
+
+
     }
 }
 

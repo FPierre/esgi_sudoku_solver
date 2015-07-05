@@ -8,23 +8,29 @@ using System.Linq.Expressions;
 
 namespace Sudoku
 {
-	public class Ensemble
+    public class Ensemble : SudokuInterface, IObservable<SudokuInterface>
 	{
+       
+
 		protected internal List<Cell> cellsList
 		{ get; set; }
-		public Ensemble (List<Cell> cellsList)
+        public Ensemble(List<Cell> cellsList, List<IObserver<SudokuInterface>> MainConsole) :base()
 		{
-			this.cellsList = cellsList;
+            this.cellsList = new List<Cell>();
+            foreach (IObserver<SudokuInterface> observer in MainConsole)
+            {
+                this.observers.Add(observer);
+            }
 		}
 
-        public Ensemble()
-        {
-            this.cellsList = new List<Cell>();
+        public Ensemble(List<IObserver<SudokuInterface>> MainConsole)
+            : this(new List<Cell>(),MainConsole)
+        { 
         }
 
-        public Ensemble( Ensemble e)
+        public Ensemble( Ensemble e) : this(e.observers)
         {
-            this.cellsList = new List<Cell>();
+            
             foreach(Cell cell in e.cellsList )
             {
                 this.Add(cell);
@@ -32,43 +38,84 @@ namespace Sudoku
 
         }
 
-
         public void Add(Cell cell)
         {
             this.cellsList.Add(cell);
             this.diffuse(cell);   
         }
 
-
+        
+        
+        
 
         public void diffuse(Cell cell)
         {
-            if (!cell.value.Equals("."))
+            if (!cell.Value.Equals("."))
             {
                 //cell.hypothesis = null;
-                List<Cell> tempCel = this.cellsList.FindAll(c => c.hypothesis.Contains(cell.value));
+                List<Cell> tempCel = this.cellsList.FindAll(c => c.hypothesis.Contains(cell.Value));
                 if (tempCel.Count != 0)
                 {
-                    tempCel.ForEach(c => c.hypothesis.Remove(cell.value));
-
-
+                    this.Log(ModeText.Verbose,  String.Format("Remove Hypothesis {0}",cell.Value),false);
+                    tempCel.ForEach(c =>RemoveValueFromHypothesis(cell,c) );
+                    
                 }
             }
+
       
             foreach (Cell c in this.cellsList)
             {
            
-                if (cell.hypothesis.Contains(c.value))
+                if (cell.hypothesis.Contains(c.Value))
                 {
-                    cell.hypothesis.Remove(c.value);
+                    cell.hypothesis.Remove(c.Value);
                 }
             }
           
         }
+
+
+        public void RemoveValueFromHypothesis(Cell cellWithValue , Cell c)
+        {
+            c.hypothesis.Remove(cellWithValue.Value);
+
+            this.Log(ModeText.Verbose,c.ToString(), false);
+        }
         public bool ExistInEnsemble(Cell c)
         {
-            if(!c.value.Equals("."))
-                return this.cellsList.Exists(cell => cell.value.Equals(c.value));
+            if(!c.Value.Equals("."))
+                return this.cellsList.Exists(cell => cell.Value.Equals(c.Value));
+            return false;
+        }
+
+
+        private bool CellExistsInEnsemble(Cell cell, Cell cell2)
+        {
+            if(cell.Value.Equals(cell2.Value))
+            {
+                Log(ModeText.Error, "Deux cellules ont la même valeur", false);
+                Log(ModeText.Error, cell.ToString(), false);
+                Log(ModeText.Error, cell2.ToString(), true);
+                return true;
+            }
+            return false;
+        }
+
+        public bool ExistsInEnsembleHypothesis(String value,Cell c)
+        {
+          
+            if (!value.Equals("."))
+            {
+               var temp = this.cellsList.FindAll(cell => !cell.Equals(c));
+               foreach(Cell tempCel in temp)
+               {
+                   if(tempCel.hypothesis.Contains(value))
+                   {
+                       return true;
+                   }
+               }
+               
+            }
             return false;
         }
 

@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sudoku
 {
-	public class CellsGrid
+    public class CellsGrid : SudokuInterface, IObservable<SudokuInterface> 
 	{
        // private static string gridDelimiter = @"//---------------------------";
 
@@ -73,10 +73,11 @@ namespace Sudoku
         }
 
         Resolver GridRecursiveResolver;
-           
 
-        
-		public CellsGrid (Cell[,] value , List<String> defaultValues)  
+
+
+        public CellsGrid(Cell[,] value, List<String> defaultValues, List<IObserver<SudokuInterface>> MainConsole)
+            : this(MainConsole) 
 		{
             GridRecursiveResolver = new Resolver();
             this.cantResolve = false;
@@ -87,7 +88,8 @@ namespace Sudoku
 		}
 
 
-        public CellsGrid (CellsGrid cellsgrid)
+        public CellsGrid(CellsGrid cellsgrid) 
+            : this(cellsgrid.observers)
         {
             this.cantResolve = cellsgrid.cantResolve;
             this.size = cellsgrid.size;
@@ -107,63 +109,94 @@ namespace Sudoku
             {
                if( MesEnsembleLine.Count <= i)
                {
-                   MesEnsembleLine.Add(new Ensemble());
+                   MesEnsembleLine.Add(new Ensemble(this.observers));
                }
 
                 for(int j = 0 ; j < size ; j++)
                 {
                     if (MesEnsembleColumn.Count <= j)
                     {
-                        MesEnsembleColumn.Add(new Ensemble());
+                        MesEnsembleColumn.Add(new Ensemble(this.observers));
                     }
 
                     int indexSector = ((int)(Math.Floor(i / sqrtNumber) * sqrtNumber + Math.Floor(j / sqrtNumber)));
 
                     if (MesEnsembleSector.Count <= indexSector)
                     {
-                        MesEnsembleSector.Add(new Ensemble());
+                        MesEnsembleSector.Add(new Ensemble(this.observers));
                     }
-                   this.grid[i,j] = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], cellsgrid.grid[i, j].value, cellsgrid.grid[i,j].hypothesis,i,j );
+                   this.grid[i,j] = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], cellsgrid.grid[i, j].Value, cellsgrid.grid[i,j].hypothesis,i,j,this.observers );
                     this.grid[i,j].addItsEnsemble();
                 }
             }
         }
 
-        public CellsGrid(Cell[,] value , List<String> defaultValues , String date, String name) : this(value,defaultValues)
+        public CellsGrid(Cell[,] value, List<String> defaultValues, String date, String name, List<IObserver<SudokuInterface>> MainConsole)
+            : this(value, defaultValues, MainConsole)  
         {
+
             this.date = date;
             this.name = name;
         }
 
-        private CellsGrid()
+        private CellsGrid(List<IObserver<SudokuInterface>> MainConsole)
+            : base()
         {
+            foreach(IObserver<SudokuInterface> observer in MainConsole )
+            {
+                this.observers.Add(observer);
+            }
             // TODO: Complete member initialization
         }
 
       
 
 
-        public CellsGrid  resolveGrid()
+        public CellsGrid  resolveGrid(bool normalMode = true)
         {
-            CellsGrid TempGrid = new CellsGrid();
+            CellsGrid TempGrid = new CellsGrid(this.observers);
             do
             {
                 int oldNumberResolution = numberOfDots;
                 bool doSomething = false;
                 foreach(Cell c in grid)
                 {
-                    if(c.value.Equals(".") && c.hypothesis.Count == 1)
+
+                    if (c.Value.Equals(".") && c.hypothesis.Count == 1)
                     {
-                        
-                        c.value = c.hypothesis.First();
+
+                        c.Value = c.hypothesis.First();
+                        this.Log(ModeText.Verbose, String.Format("Add value {0} at [{1},{2}]",c.Value, c.PosX ,c.PosY), false);
+                        this.Log(ModeText.Verbose, String.Format("Diffuse in all Ensemble the value",c.Value, c.PosX ,c.PosY), false);
+
                         c.diffuseInItsEnsemble();
                         doSomething = true;
                         numberOfDots--;
                         Console.WriteLine(this);
-//                        Console.ReadLine();
+
+                    }
+                    else
+                    {
+                        if (c.Value.Equals("."))
+                        {
+                            foreach (String hypothesis in c.hypothesis)
+                            {
+                                
+                            
+                                if ( (( !c.listColumn.ExistsInEnsembleHypothesis(hypothesis, c)  || !c.listLine.ExistsInEnsembleHypothesis(hypothesis, c)) ||  !c.listSector.ExistsInEnsembleHypothesis(hypothesis, c)))
+                                {
+                                    c.Value = hypothesis;
+                                    c.diffuseInItsEnsemble();
+                                    doSomething = true;
+                                    numberOfDots--;
+                                    Console.WriteLine(this);
+                                    break;
+                                }
+                            }
+                        }
                     }
 
-                    if(c.value.Equals(".") && c.hypothesis.Count == 0)
+                    if(c.Value.Equals(".") && c.hypothesis.Count == 0)
                     {
 
                         this.cantResolve = true;
@@ -175,15 +208,21 @@ namespace Sudoku
                 if (doSomething == false && oldNumberResolution == numberOfDots && this.cantResolve == false)
                 {
 
-                    
-                    TempGrid = new CellsGrid(GridRecursiveResolver.ResolveBlockCells(this));
-                    if(TempGrid.isDone())           //Save have a different Adresse 
+                    if (normalMode == true)
                     {
-                        return TempGrid;
+                        TempGrid = new CellsGrid(GridRecursiveResolver.ResolveBlockCells(this));
+                        if (TempGrid.isDone())           //Save have a different Adresse 
+                        {
+                            return TempGrid;
+                        }
+                        if (TempGrid.cantResolve == true)
+                        {
+                            return TempGrid;
+                        }
                     }
-                    if(TempGrid.cantResolve == true)
+                    else
                     {
-                        return TempGrid;
+                        return this;
                     }
                 }
             }
@@ -191,12 +230,6 @@ namespace Sudoku
            return this;
 
         }
-
-        
-
-
-
-
 
 
         public void verifyAppearance()
@@ -217,7 +250,9 @@ namespace Sudoku
                     {
                         
                         error = String.Format("grille : {3} {4}la cellule à l'index {0},{1} a une valeur semblable dans sa ligne, dans sa colonne ou dans son secteur", i, j,this.name,Environment.NewLine);
-                        Console.Out.WriteLine(error);
+
+                        this.Log(ModeText.Error, error, false);
+
                         this.isValid = false;
                         break;
                     }
@@ -233,7 +268,7 @@ namespace Sudoku
         {
             foreach(Cell cell in grid)
             {
-                if(cell.value.Equals("."))
+                if(cell.Value.Equals("."))
                 {
                     return false;
                 }
@@ -255,7 +290,7 @@ namespace Sudoku
             {
                 for(int j = 0 ; j < size ; j++)
                 {
-                    text.AppendFormat("{0,3}", grid[i, j].value);
+                    text.AppendFormat("{0,3}", grid[i, j].Value);
                     if (grid[i, j].hypothesis.Count != 0 )
                         text.AppendFormat("({0})", grid[i, j].hypothesis.Aggregate((stringa,stringb) => stringa+ stringb));
                    // text.AppendFormat("({0})", grid[i, j].hypothesis.Aggregate((stringa, stringb) => stringa + stringb));
@@ -299,7 +334,8 @@ namespace Sudoku
             return false;
 
         }
-        
+
+
 
 	}
 }

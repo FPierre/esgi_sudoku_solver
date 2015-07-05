@@ -14,7 +14,8 @@ namespace Sudoku
         static void Main(string[] args)
         {
             // Affiche le menu console pour choisir son mode
-            ConsoleMenu.show();
+            ConsoleMenu MainConsole = new ConsoleMenu();
+            MainConsole.show();
         }
 
 		public static string selectFile() {

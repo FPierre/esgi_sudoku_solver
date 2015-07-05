@@ -6,13 +6,21 @@ using System.Threading.Tasks;
 
 namespace Sudoku
 {
-    class ConsoleMenu
+    public enum ModeText { Verbose, Warning, Error };
+    public class ConsoleMenu : IObserver<SudokuInterface>
     {
-        private static int choice;
-        public static SudokuManager manager;
-        private static bool managerIsOn = false;
+        public static bool StepByStep = false;
+        public static ModeText mode = ModeText.Warning;
+        private  String choice;
+        public  SudokuManager manager;
+        private  bool managerIsOn = false;
+        StringBuilder result;
+        public ConsoleMenu() : base()
+        {
+            result = new StringBuilder();  
+        }
 
-        public static void show()
+        public void show()
         {
             string menu = " ****** Menu ****** " + Environment.NewLine +
                 " 1 – Sudoku file validation "   + Environment.NewLine +
@@ -24,47 +32,46 @@ namespace Sudoku
             {
                 Console.Write(menu);
 
-                choice = Convert.ToInt32(Console.ReadLine());
+                choice = Console.ReadLine();
 
-                string result = compute(choice);
+                 compute();
 
-                Console.WriteLine(result);
+                //Console.WriteLine(result);
 
-                redirect(choice);
+                //redirect(choice);
             }
-            while (choice != 4);
+            while (!choice.Equals("3"));
 
             Console.ReadLine();
         }
 
-        private static string compute(int choice)
+        private  void compute()
         {
-            string result = " ";
-
+      
             switch (choice)
             {
-                case 1:
-                    result += "–> Sudoku file validation ";
-                    manager = new SudokuManager(Properties.Resources.testSudoku);
+                case "1":
+                    result.Append( "–> Sudoku file validation ");
+                    manager = new SudokuManager(Properties.Resources.testSudoku,this);
                     managerIsOn = true;
                     break;
-                case 2:
-                    result += "–> Sudoku file resolution ";
+                case "2":
+                    result.Append("–> Sudoku file resolution ");
                     if(managerIsOn == false)
-                        manager = new SudokuManager(Properties.Resources.testSudoku);
+                        manager = new SudokuManager(Properties.Resources.testSudoku,this);
+                    ConsoleMenu.mode = ModeText.Verbose;
                     manager.resolveAll();
                     break;
-                case 3:
-                    result += "–> Bye bye ! ";
+                case "3":
+                    result.Append("–> Bye bye ! ");
                     // Sort du programme
                     Environment.Exit(0);
                     break;
                 default:
-                    result += "Bad choice, try again ";
+                    result.Append( "Bad choice, try again ");
                     break;
             }
 
-            return result;
         }
 
         private static int redirect(int choice)
@@ -81,5 +88,36 @@ namespace Sudoku
 
             return 0;
         }
+
+
+        // The observable invokes this method to pass the Subject object to the observer
+        public void OnNext(SudokuInterface currentObject)
+        {
+            if (ConsoleMenu.mode <= currentObject.lastTextLogLevel)
+            {
+                Console.WriteLine(currentObject.TextLog);
+                result.Append(currentObject.TextLog);
+                if (ConsoleMenu.StepByStep == true)
+                {
+                    Console.ReadLine();
+                }
+            }
+        }
+
+
+
+        // Usually called when a transmission is complete. Not implemented.
+        public void OnCompleted()
+        {
+            throw new NotImplementedException();
+        }
+
+        // Usually called when there was an error. Didn't implement.
+        public void OnError(Exception error)
+        {
+            throw new NotImplementedException();
+        }
+
+
     }
 }
