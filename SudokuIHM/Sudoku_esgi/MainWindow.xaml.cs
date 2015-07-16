@@ -26,6 +26,7 @@ namespace Sudoku_esgi {
 
         private void initIHM() {
             ActionSudoku.Content = "Validation";
+            ModalDialog.SetParent(ParentWindow);
         }
 
         private void StepByStepUnchecked(object sender, RoutedEventArgs e) {
@@ -77,6 +78,11 @@ namespace Sudoku_esgi {
                 ((Rectangle) b).Fill = new SolidColorBrush(Colors.Blue);
             } else {
                 b = new Button();
+                ((Button) b).Click += (s, e) => { 
+                    /** Affichage des hypo **/;
+                    //MessageBox.Show("Hypothèses");
+                    ModalDialog.ShowHandlerDialog("Hypothesis");
+                };
                 ((Button) b).Content = c;
             }
             Grid.SetRow(b, i);
