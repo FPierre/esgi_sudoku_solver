@@ -19,7 +19,7 @@ namespace Sudoku
         }
 
 		public static string selectFile() {
-			return @"c:\Fichier_de_sudoku_résolution2.sud";
+            return @"../../../Fichier_sudokus_a_resoudre.sud";
 		}
     }
 }

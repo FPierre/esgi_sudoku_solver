@@ -118,6 +118,6 @@
     <value>System.Resources.ResXResourceWriter, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
   </resheader>
   <data name="testSudoku" xml:space="preserve">
-    <value>C:\Sudokus à Résoudre.sud</value>
+    <value>../../../Fichier_sudokus_a_resoudre.sud</value>
   </data>
 </root>

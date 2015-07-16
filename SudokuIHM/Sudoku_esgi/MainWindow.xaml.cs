@@ -16,6 +16,9 @@ using System.Windows.Shapes;
 namespace Sudoku_esgi {
 
     public partial class MainWindow : Window {
+
+        private string ButtonName { get; set; }
+
         public MainWindow() {
             InitializeComponent();
             DataContext = App.SudokuManager;
@@ -26,7 +29,6 @@ namespace Sudoku_esgi {
 
         private void initIHM() {
             ActionSudoku.Content = "Validation";
-            ModalDialog.SetParent(ParentWindow);
         }
 
         private void StepByStepUnchecked(object sender, RoutedEventArgs e) {
@@ -55,35 +57,33 @@ namespace Sudoku_esgi {
             GridSudoku.Children.Clear();
             GridSudoku.ColumnDefinitions.Clear();
             GridSudoku.RowDefinitions.Clear();
-            GridTest g = App.SudokuManager.GridSelect;
+            CellsGrid g = App.SudokuManager.GridSelected;
 
-            for (int i = 0; i < g.Size; ++i) {
+            for (int i = 0; i < g.size; ++i) {
                 GridSudoku.ColumnDefinitions.Add(new ColumnDefinition());
                 GridSudoku.RowDefinitions.Add(new RowDefinition());
             }
 
-            for (int i = 0; i < g.Size; ++i) {
-                for (int j = 0; j < g.Size; j++) {
+            for (int i = 0; i < g.size; ++i) {
+                for (int j = 0; j < g.size; j++) {
                     FrameworkElement b = CreateGridCase(g, i, j);
                     GridSudoku.Children.Add(b);
                 }
             }
         }
 
-        private FrameworkElement CreateGridCase(GridTest g, int i, int j) {
+        private FrameworkElement CreateGridCase(CellsGrid g, int i, int j) {
             FrameworkElement b;
-            char c = g.Tab[i, j].Value;
-            if (c == '.') {
+            string s = g[i, j].Value;
+            if (s == ".") {
                 b = new Rectangle();
                 ((Rectangle) b).Fill = new SolidColorBrush(Colors.Blue);
             } else {
                 b = new Button();
-                ((Button) b).Click += (s, e) => { 
-                    /** Affichage des hypo **/;
-                    //MessageBox.Show("Hypothèses");
-                    ModalDialog.ShowHandlerDialog("Hypothesis");
+                ((Button) b).Click += (c, e) => {
+                    // 
                 };
-                ((Button) b).Content = c;
+                ((Button) b).Content = s;
             }
             Grid.SetRow(b, i);
             Grid.SetColumn(b, j);

@@ -9,8 +9,14 @@ using System.Windows;
 namespace Sudoku_esgi {
     public partial class App : Application {
         public static SudokuManager SudokuManager { get; set; }
+
         static App() {
-            SudokuManager = new SudokuManager();
+            ConsoleMenu console = new ConsoleMenu();
+            SudokuManager = new SudokuManager(selectFile(), console);
+        }
+
+        public static string selectFile() {
+            return @"../../../Fichier_sudokus_a_resoudre.sud";
         }
     }
 }
