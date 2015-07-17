@@ -9,7 +9,6 @@ using System.Windows.Data;
 using System.Windows.Documents;
 using System.Windows.Input;
 using System.Windows.Media;
-using System.Windows.Media.Imaging;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
 
@@ -17,18 +16,9 @@ namespace Sudoku_esgi {
 
     public partial class MainWindow : Window {
 
-        private string ButtonName { get; set; }
-
         public MainWindow() {
             InitializeComponent();
             DataContext = App.SudokuManager;
-
-            // Initialise l'IHM
-            initIHM();
-        }
-
-        private void initIHM() {
-            ActionSudoku.Content = "Validation";
         }
 
         private void StepByStepUnchecked(object sender, RoutedEventArgs e) {
@@ -41,12 +31,14 @@ namespace Sudoku_esgi {
 
         private void SelectModeChanged(object sender, SelectionChangedEventArgs e) {
             ComboBoxItem selectedMode = (ComboBoxItem) SelectMode.SelectedItem;
-            ChangeButtonContent( selectedMode.Content.ToString() );
+            ChangeButtonContent(selectedMode.Content.ToString());
         }
 
         private void ChangeButtonContent(String s) {
-            if ( ActionSudoku != null )
+            if (ActionSudoku != null) {
+                ActionSudoku.Visibility = Visibility.Visible;
                 ActionSudoku.Content = s;
+            }
         }
 
         private void SelectSudokuChanged(object sender, SelectionChangedEventArgs e) {
@@ -66,28 +58,33 @@ namespace Sudoku_esgi {
 
             for (int i = 0; i < g.size; ++i) {
                 for (int j = 0; j < g.size; j++) {
-                    FrameworkElement b = CreateGridCase(g, i, j);
-                    GridSudoku.Children.Add(b);
+                    FrameworkElement elem = CreateGridCase(g, i, j);
+                    GridSudoku.Children.Add(elem);
                 }
             }
         }
 
         private FrameworkElement CreateGridCase(CellsGrid g, int i, int j) {
-            FrameworkElement b;
+            FrameworkElement elem;
             string s = g[i, j].Value;
-            if (s == ".") {
-                b = new Rectangle();
-                ((Rectangle) b).Fill = new SolidColorBrush(Colors.Blue);
+            if (s != ".") {
+                elem = new TextBox();
+                TextBox rect = (TextBox) elem;
+                rect.Style = (Style) FindResource("RedBlockOpacity");
+                rect.Text = s;
             } else {
-                b = new Button();
-                ((Button) b).Click += (c, e) => {
+                elem = new Button();
+                Button btn = (Button) elem;
+                btn.Style = (Style) FindResource("RedButton");
+                btn.Click += (c, e) => {
                     // 
                 };
-                ((Button) b).Content = s;
+
+                btn.Content = s;
             }
-            Grid.SetRow(b, i);
-            Grid.SetColumn(b, j);
-            return b;
+            Grid.SetRow(elem, i);
+            Grid.SetColumn(elem, j);
+            return elem;
         }
 
         private void TreatSudoku(object sender, RoutedEventArgs e) {
