@@ -155,6 +155,7 @@ namespace Sudoku
         public CellsGrid  resolveGrid(bool normalMode = true)
         {
             CellsGrid TempGrid = new CellsGrid(this.observers);
+            TempGrid.GridRecursiveResolver = this.GridRecursiveResolver;
             do
             {
                 int oldNumberResolution = numberOfDots;
@@ -166,8 +167,8 @@ namespace Sudoku
                     {
 
                         c.Value = c.hypothesis.First();
-                        this.Log(ModeText.Verbose, String.Format("Add value {0} at [{1},{2}]",c.Value, c.PosX ,c.PosY));
-                        this.Log(ModeText.Verbose, String.Format("Diffuse in all Ensemble the value",c.Value, c.PosX ,c.PosY));
+                        this.Log(ModeText.Verbose, String.Format("Inject {0} at [{1},{2}]",c.Value, c.PosX ,c.PosY));
+                        //this.Log(ModeText.Verbose, String.Format("Diffuse in all Ensemble the value",c.Value, c.PosX ,c.PosY));
 
                         c.diffuseInItsEnsemble();
                         doSomething = true;
@@ -185,6 +186,7 @@ namespace Sudoku
                             
                                 if ( (( !c.listColumn.ExistsInEnsembleHypothesis(hypothesis, c)  || !c.listLine.ExistsInEnsembleHypothesis(hypothesis, c)) ||  !c.listSector.ExistsInEnsembleHypothesis(hypothesis, c)))
                                 {
+                                    this.Log(ModeText.Verbose, String.Format("exclusions des hypothéses"));
                                     c.Value = hypothesis;
                                     c.diffuseInItsEnsemble();
                                     doSomething = true;
@@ -211,11 +213,7 @@ namespace Sudoku
                     if (normalMode == true)
                     {
                         TempGrid = new CellsGrid(GridRecursiveResolver.ResolveBlockCells(this));
-                        if (TempGrid.isDone())           //Save have a different Adresse 
-                        {
-                            return TempGrid;
-                        }
-                        if (TempGrid.cantResolve == true)
+                        if (TempGrid.isDone() || TempGrid.cantResolve == true)           //Save have a different Adresse 
                         {
                             return TempGrid;
                         }
@@ -332,7 +330,27 @@ namespace Sudoku
             }
 
             return false;
+        }
 
+
+        public  bool EqualsInCell(object obj)
+        {
+            if (obj is CellsGrid)
+            {
+                
+                CellsGrid compareGrid = obj as CellsGrid;
+                if(compareGrid.size != this.size)
+                    return false;
+                foreach(Cell c in this.grid)
+                {
+                    if(!(compareGrid[c.PosX,c.PosY].EqualsInValueAndHypothesis(c)))
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            return false;
         }
 
 

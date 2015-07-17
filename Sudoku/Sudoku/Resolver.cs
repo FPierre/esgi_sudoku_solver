@@ -9,6 +9,7 @@ namespace Sudoku
 
 	public class Resolver :  SudokuObject, IObservable<SudokuObject>
 	{
+         int profondeur = 0;
 		public List<CellsGrid> listHypotheticSudoku;
 		public int index = 0;
 
@@ -143,7 +144,8 @@ namespace Sudoku
         private void deleteInListCells(List<Cell> cells , Cell cell, Cell nextCell)
         {
 
-             cells=cells.FindAll(Mycell => !Mycell.Equals(cell) && !Mycell.Equals(nextCell));
+
+             cells=cells.FindAll(Mycell => !Mycell.EqualsInValueAndHypothesis(cell) && !Mycell.EqualsInValueAndHypothesis(nextCell));
              foreach (String hypothesisString in cell.hypothesis)
             {
                 foreach (Cell tempCell in cells)
@@ -155,12 +157,16 @@ namespace Sudoku
 
         private void deleteAllHypothesisFromEnsembleInCell(List<Cell> blockCells,Cell c)
         {
+            
+            
            for(int i = 0 ; i < blockCells.Count -1 ; i++)
            {
+               Log(ModeText.Verbose, String.Format("Delete hypothesis {0}",blockCells[i].hypothesis.Aggregate( (stringa, stringb) => stringa + stringb)));
                int j = i +1;
                if(blockCells[i].ExistsInEnsemble(blockCells[j].listColumn))
                {
                    deleteInListCells(blockCells[j].listColumn.cellsList, blockCells[i], blockCells[j]);
+
                }
 
                if (blockCells[i].ExistsInEnsemble(blockCells[j].listLine))
@@ -178,8 +184,10 @@ namespace Sudoku
 
 
 
+
         public  CellsGrid ResolveBlockCells(CellsGrid grid)
         {
+           
             List<CellsGrid> testList = new List<CellsGrid>();
             testList.Add(grid);
             testList.Add(new CellsGrid(grid));
@@ -195,22 +203,43 @@ namespace Sudoku
             foreach(Cell c in blockCells)
             {
                 Console.Out.WriteLine(c.hypothesis.Aggregate((stringa,stringb) => stringa + stringb));
-
-                TextLog = String.Format("({0},{1})", c.PosX, c.PosY);
+                Log(ModeText.Verbose,  String.Format("({0},{1})", c.PosX, c.PosY));
+ 
                // Console.ReadLine();
             }
             if(blockCells.Count == 0)
             {
-                if (this.listHypotheticSudoku.Count > 0)
+                if (listHypotheticSudoku.Any(Listgrid => grid.EqualsInCell(Listgrid)))
                 {
-                   // grid = this.listHypotheticSudoku.Last();
-                 //   this.listHypotheticSudoku.Remove(this.listHypotheticSudoku.Last());
                     grid.cantResolve = true;
+                    return grid;
+                }
+                listHypotheticSudoku.Add(grid);
+
+                Log(ModeText.Verbose, "Pure brute force");
+                foreach (KeyValuePair<string, List<Cell>> keyPair in sortedCells)
+                {
+                  
+                    foreach(Cell c in keyPair.Value)
+                    {
+                        List<String> temp = new List<String>(c.hypothesis);
+                        foreach(String hypothesis in temp)
+                        {
+                            testHypothesis(hypothesis, testList, c);
+                            if (testList.Last().isDone())
+                            {
+                                profondeur--;
+                                return testList.Last();
+                               
+                            }
+                        }
+                    }
+
                 }
             }
             else
             {
-                for(int i = 0 ; i < blockCells.Count-1 ; i++ )
+                for(int i = 0 ; i < blockCells.Count ; i++ )
                 {
 
                     var cell = blockCells[i];
@@ -224,69 +253,59 @@ namespace Sudoku
                     Console.Out.WriteLine(testList.Last());
                     if (testList.Last().isDone())
                     {
-
+                        profondeur--;
                         return testList.Last();
                     }
                     
                     
                     foreach (String Hypothesis in temp)
                    {
-                       testList.Add(new CellsGrid(testList.Last()));
-                       Console.Out.WriteLine(testList.Last());
-                       Cell realCell = testList.Last()[cell.PosX, cell.PosY];
-                       testList.Last().cantResolve = false;
-                       lastTextLogLevel = ModeText.Verbose;
-                       TextLog = String.Format("test value {0} at  ({1},{2})", Hypothesis,realCell.PosX,realCell.PosY);
-                       if (realCell == null)
-                       {
-                           Log(ModeText.Error,"cell is null");
-                       }
-                           realCell.Value = Hypothesis;
-                           realCell.diffuseInItsEnsemble();
-                           //Console.Out.WriteLine(testList.Last());
-                        testList.Add( testList.Last().resolveGrid());
 
-
-                        if (testList.Last().isDone())
+                       testHypothesis(Hypothesis, testList, cell);
+                        if(testList.Last().isDone())
                         {
-                           // Console.WriteLine("Resolve");
                             return testList.Last();
-
                         }
-                            if (testList.Last().cantResolve == true)
-                           {
-                               
-                               testList.Remove(testList.Last());
-                               testList.Remove(testList.Last());
-                               testList.Last().cantResolve = true;
-                               //this.listHypotheticSudoku.Remove(this.listHypotheticSudoku.Last());
-
- 
-                               Log(ModeText.Verbose, "RollBack");
-                               // Console.Out.WriteLine(testList.Last());
-                                
- 
-                              //  Console.In.ReadLine();
-                              //  Console.In.ReadLine();
-                               //realCell = tempCell;
-                           }  
-                        }
+                   }
 
                     testList.Last().cantResolve = true;
                     
                     testList.Remove(testList.Last());
               }
            }
-            if (!grid.isDone())
-            {
-                
-                grid = testList.First();
-                grid.cantResolve = true;
-
-            }
-
-
+            grid.cantResolve = true;
+            profondeur--;
             return grid;
+            
+        }
+
+        private void testHypothesis(string Hypothesis, List<CellsGrid> testList, Cell cell)
+        {
+            testList.Add(new CellsGrid(testList.Last()));
+            Console.Out.WriteLine(testList.Last());
+            Cell realCell = testList.Last()[cell.PosX, cell.PosY];
+            testList.Last().cantResolve = false;
+            lastTextLogLevel = ModeText.Verbose;
+            TextLog = String.Format("test value {0} at  ({1},{2})", Hypothesis, realCell.PosX, realCell.PosY);
+            if (realCell == null)
+            {
+                Log(ModeText.Error, "cell is null");
+            }
+            realCell.Value = Hypothesis;
+            realCell.diffuseInItsEnsemble();
+            //Console.Out.WriteLine(testList.Last());
+            testList.Add(testList.Last().resolveGrid());
+            profondeur++;
+            if (testList.Last().cantResolve == true)
+            {
+
+                testList.Remove(testList.Last());
+                testList.Remove(testList.Last());
+                testList.Last().cantResolve = true;
+
+                Log(ModeText.Verbose, "RollBack");
+
+            } 
         }
       
 		public void RecursivebrowseGrid (CellsGrid grid, int line, int column) {

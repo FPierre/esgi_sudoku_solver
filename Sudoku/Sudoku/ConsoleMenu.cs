@@ -51,12 +51,17 @@ namespace Sudoku
                 case "1":
                     result.Append( "–> Sudoku file validation ");
                     manager = new SudokuManager(Properties.Resources.testSudoku,this);
-                    managerIsOn = true;
+                    this.managerIsOn = true;
                     break;
                 case "2":
                     result.Append("–> Sudoku file resolution ");
-                    if(managerIsOn == false)
-                        manager = new SudokuManager(Properties.Resources.testSudoku,this);
+                    if (this.managerIsOn == false)
+                    {
+                        defineStepByStep();
+                        manager = new SudokuManager(Properties.Resources.testSudoku, this);
+                        this.managerIsOn = true;
+                        
+                    }
                     ConsoleMenu.mode = ModeText.Verbose;
                     int choiceSudokuu = this.chooseSudoku();
 
@@ -67,6 +72,7 @@ namespace Sudoku
                     }
                     else
                     {
+                        defineStepByStep();
                         manager.resolve(choiceSudokuu);
                     }
                     
@@ -134,10 +140,32 @@ namespace Sudoku
             Console.WriteLine("Choissisez quel sudoku vous voullez resoudre");
             int choice = this.manager.displayNames();
             
-                
-            
-            return choice;
-            
+            return choice;    
+        }
+
+
+        public void defineStepByStep()
+        {
+            bool response = false;
+            do
+            {
+                Console.WriteLine("voullez vous faire du pas à pas ? oui/non");
+
+                string choice = Console.ReadLine();
+                switch (choice)
+                {
+                    case "oui": ConsoleMenu.StepByStep = true;
+                        response = true;
+                        break;
+
+                    case "non": ConsoleMenu.StepByStep = false;
+                        response = true;
+                        break;
+
+                    default: Console.WriteLine("mauvaise réponse");
+                        break;
+                }
+            } while (response == false);
         }
 
 

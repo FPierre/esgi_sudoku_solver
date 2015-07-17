@@ -209,6 +209,18 @@ namespace Sudoku
             return base.Equals(obj);
         }
 
+
+        public  bool EqualsInValueAndHypothesis(object obj)
+        {
+            if(obj is Cell)
+            {
+                Cell myCell = obj as Cell;
+                return myCell.Value.Equals(this.Value) && myCell.hypothesis.SequenceEqual(this.hypothesis);
+            }
+            return false;
+
+        }
+
         public override string ToString()
         {
             StringBuilder result = new StringBuilder();

@@ -24,11 +24,6 @@ namespace Sudoku {
      
             this.ModelList = new List<CellsGrid>();
             this.Mode = mode;
-            if (mode == 1)
-                ConsoleMenu.StepByStep = true;
-            ConsoleMenu.mode = ModeText.Warning;
-
-
 
             Subscribe(MainConsole);
 

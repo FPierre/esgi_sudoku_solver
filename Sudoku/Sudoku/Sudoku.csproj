@@ -56,7 +56,7 @@
     <Compile Include="SudokuObject.cs" />
     <Compile Include="SudokuManager.cs" />
     <Compile Include="Utility.cs" />
-    <Compile Include="ViewInterface.cs" />
+    <Compile Include="ViewObject.cs" />
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
