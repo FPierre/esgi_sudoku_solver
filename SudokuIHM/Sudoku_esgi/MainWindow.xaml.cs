@@ -32,15 +32,13 @@ namespace Sudoku_esgi {
         public MainWindow() {
             InitializeComponent();
             Logs = new ObservableCollection<string>();
-            ModelList = new ObservableCollection<CellsGrid>();
+            
 
             if (OpenFile())
             {
                 DataContext = sudokuManager;
-                foreach( CellsGrid grid in  sudokuManager.ModelList)
-                {
-                    ModelList.Add(grid);
-                }
+                ModelList = new ObservableCollection<CellsGrid>(sudokuManager.ModelList);
+                
             }
             else
             {
@@ -91,7 +89,10 @@ namespace Sudoku_esgi {
             if (mode == 0) {
 
             } else if (sudokuManager.GridSelected != null && mode == 1) {
-                sudokuManager.resolveSelected(); 
+               var sudoku = ModelList.Where((grid => grid.name.Equals( sudokuManager.GridSelected.name))).Take(1);
+               sudokuManager.GridSelected = sudoku.First();
+               sudokuManager.resolveSelected();
+
             } else
                 MessageBox.Show("Tu dois d'abord sélectionner un sudoku.");
         }
@@ -108,37 +109,54 @@ namespace Sudoku_esgi {
             GridSudoku.Children.Clear();
             GridSudoku.ColumnDefinitions.Clear();
             GridSudoku.RowDefinitions.Clear();
-            CellsGrid g = sudokuManager.GridSelected;
 
-            for (int i = 0; i < g.size; ++i) {
+
+
+            for (int i = 0; i < sudokuManager.GridSelected.size; ++i)
+            {
                 GridSudoku.ColumnDefinitions.Add(new ColumnDefinition());
                 GridSudoku.RowDefinitions.Add(new RowDefinition());
             }
 
-            for (int i = 0; i < g.size; ++i) {
-                for (int j = 0; j < g.size; j++) {
-                    FrameworkElement elem = CreateGridCase( g[i, j].Value, i, j );
+            for (int i = 0; i < sudokuManager.GridSelected.size; ++i) {
+                for (int j = 0; j < sudokuManager.GridSelected.size; j++)
+                {
+                    FrameworkElement elem = CreateGridCase(sudokuManager.GridSelected[i, j], i, j);
+              
                     GridSudoku.Children.Add(elem);
                 }
             }
         }
 
-        private FrameworkElement CreateGridCase(string s, int i, int j) {
+        private FrameworkElement CreateGridCase(Cell c, int i, int j) {
             FrameworkElement elem;
-            if (s != ".") {
+            if (c.Value != ".") {
                 elem = new TextBox();
                 TextBox rect = (TextBox) elem;
                 rect.Style = (Style) FindResource("RedBlockOpacity");
-                rect.Text = s;
+
+                Binding myBinding = new Binding();
+                myBinding.Source = c;
+                myBinding.Path = new PropertyPath("Value");
+                myBinding.Mode = BindingMode.TwoWay;
+                myBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+                BindingOperations.SetBinding(rect, TextBox.TextProperty, myBinding);
+  
             } else {
                 elem = new Button();
                 Button btn = (Button) elem;
                 btn.Style = (Style) FindResource("RedButton");
-                btn.Click += (c, e) => {
+                /*btn.Click += (c, e) => {
                     // 
                 };
-
-                btn.Content = s;
+                 * */
+                btn.Content = c.Value;
+                Binding myBinding = new Binding();
+                myBinding.Source = c;
+                myBinding.Path = new PropertyPath("Value");
+                myBinding.Mode = BindingMode.TwoWay;
+                myBinding.UpdateSourceTrigger = UpdateSourceTrigger.PropertyChanged;
+                BindingOperations.SetBinding(btn, Button.NameProperty, myBinding);
             }
             Grid.SetRow(elem, i);
             Grid.SetColumn(elem, j);
@@ -164,12 +182,13 @@ namespace Sudoku_esgi {
             throw new NotImplementedException();
         }
         
-        public void UpdateGridCase(string s, int i, int j) {
+      /*  public void UpdateGridCase(string s, int i, int j) {
             FrameworkElement elem = GridSudoku.Children.OfType<FrameworkElement>()
                                     .FirstOrDefault(child => Grid.GetRow(child) == i && Grid.GetColumn(child) == j);
             GridSudoku.Children.Remove(elem);
             elem = CreateGridCase(s, i, j);
             GridSudoku.Children.Add(elem);
         }
+       * */
     }
 }
