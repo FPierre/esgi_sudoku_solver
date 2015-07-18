@@ -23,7 +23,7 @@ namespace Sudoku
             {
                 textLog_ = value;
                 observers.ForEach(observer => observer.OnNext(this));
-                NotifyPropertyChanged("Log");
+                NotifyPropertyChanged("Logs");
             }
         }
 

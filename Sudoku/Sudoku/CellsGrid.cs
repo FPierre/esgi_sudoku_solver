@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sudoku
 {
-    public class CellsGrid : SudokuObject, IObservable<SudokuObject> 
+    public class CellsGrid : SudokuObject, IObservable<SudokuObject> ,
 	{
        // private static string gridDelimiter = @"//---------------------------";
 
@@ -73,7 +73,7 @@ namespace Sudoku
         }
 
         Resolver GridRecursiveResolver;
-
+        public List<CellsGrid> listHypotheticSudoku;
 
 
         public CellsGrid(Cell[,] value, List<String> defaultValues, List<IObserver<SudokuObject>> MainConsole)
@@ -84,6 +84,7 @@ namespace Sudoku
             size = defaultValues.Count;
             grid = value;
             required = defaultValues.Aggregate( (i , j) => i +j);
+            listHypotheticSudoku = new List<CellsGrid>();
        //     verifyAppearance();
 		}
 
@@ -91,6 +92,8 @@ namespace Sudoku
         public CellsGrid(CellsGrid cellsgrid) 
             : this(cellsgrid.observers)
         {
+            this.listHypotheticSudoku = new List<CellsGrid>(cellsgrid.listHypotheticSudoku);
+
             this.cantResolve = cellsgrid.cantResolve;
             this.size = cellsgrid.size;
             this.required = cellsgrid.required;
@@ -154,8 +157,8 @@ namespace Sudoku
 
         public CellsGrid  resolveGrid(bool normalMode = true)
         {
-            CellsGrid TempGrid = new CellsGrid(this.observers);
-            TempGrid.GridRecursiveResolver = this.GridRecursiveResolver;
+            
+
             do
             {
                 int oldNumberResolution = numberOfDots;
@@ -212,11 +215,8 @@ namespace Sudoku
 
                     if (normalMode == true)
                     {
-                        TempGrid = new CellsGrid(GridRecursiveResolver.ResolveBlockCells(this));
-                        if (TempGrid.isDone() || TempGrid.cantResolve == true)           //Save have a different Adresse 
-                        {
-                            return TempGrid;
-                        }
+                        return this.ResolveBlockCells();
+                       
                     }
                     else
                     {
@@ -224,9 +224,271 @@ namespace Sudoku
                     }
                 }
             }
-            while (!this.isDone() && TempGrid.cantResolve == false);
+            while (!this.isDone() && this.cantResolve == false);
            return this;
 
+        }
+
+        public Dictionary<string, List<Cell>> counBlockCells()
+        {
+
+            Dictionary<string, List<Cell>> listOccurenHypothesis = new Dictionary<String, List<Cell>>();
+
+            foreach (var cell in this.grid)
+            {
+                if (cell.Value.Equals("."))
+                {
+
+                    if (cell.hypothesis.Count > 0)
+                    {
+                        String str = cell.hypothesis.Aggregate((stringa, stringb) => stringa + stringb);
+
+                        if (listOccurenHypothesis.ContainsKey(str))
+                        {
+
+                            listOccurenHypothesis[str].Add(cell);
+                        }
+                        else
+                        {
+                            List<Cell> temp = new List<Cell>();
+                            temp.Add(cell);
+                            listOccurenHypothesis.Add(str, temp);
+
+                        }
+                    }
+                }
+            }
+            return listOccurenHypothesis;
+        }
+
+
+        public List<KeyValuePair<string, List<Cell>>> sortedBlockCells(Dictionary<string, List<Cell>> dict)
+        {
+            List<KeyValuePair<string, List<Cell>>> myList = dict.ToList();
+            myList.Sort(
+                delegate(KeyValuePair<string, List<Cell>> firstpair,
+                KeyValuePair<string, List<Cell>> nextPair)
+                {
+
+                    if (firstpair.Key.Length == nextPair.Key.Length)
+                        return 0;
+                    if (firstpair.Key.Length < nextPair.Key.Length)
+                        return -1;
+
+                    return 1;
+                }
+             );
+
+            return myList;
+        }
+
+        public List<Cell> getBlockCells(List<KeyValuePair<string, List<Cell>>> list)
+        {
+
+            bool doSomething = false;
+            List<Cell> result = new List<Cell>();
+
+            int i = 0;
+            do
+            {
+                Cell[] cellTable = list[i].Value.ToArray();
+                if (cellTable.Count() > 1)
+                {
+                    for (int j = 0, K = 1; K < cellTable.Count(); j++, K++)
+                    {
+                        if (cellTable[j].existInEnsembleOf(cellTable[K]))
+                        {
+                            result.Add(cellTable[j]);
+                            result.Add(cellTable[K]);
+                            doSomething = true;
+                        }
+
+                    }
+                    if (i == (list.Count - 1) && doSomething == false)
+                    {
+                        Log(ModeText.Error, "Aucune Solution trouvé");
+
+                        Log(ModeText.Error, "Retour à la version précédente si existe");
+
+                        doSomething = true;
+                    }
+
+                }
+                i++;
+            }
+            while (i < list.Count && doSomething == false);
+
+
+            return result;
+        }
+
+
+        private void deleteInListCells(List<Cell> cells, Cell cell, Cell nextCell)
+        {
+
+
+            cells = cells.FindAll(Mycell => !Mycell.EqualsInValueAndHypothesis(cell) && !Mycell.EqualsInValueAndHypothesis(nextCell));
+            foreach (String hypothesisString in cell.hypothesis)
+            {
+                foreach (Cell tempCell in cells)
+                {
+                    tempCell.hypothesis.Remove(hypothesisString);
+                }
+            }
+        }
+
+        private void deleteAllHypothesisFromEnsembleInCell(List<Cell> blockCells, Cell c)
+        {
+
+
+            for (int i = 0; i < blockCells.Count - 1; i++)
+            {
+                Log(ModeText.Verbose, String.Format("Delete hypothesis {0}", blockCells[i].hypothesis.Aggregate((stringa, stringb) => stringa + stringb)));
+                int j = i + 1;
+                if (blockCells[i].ExistsInEnsemble(blockCells[j].listColumn))
+                {
+                    deleteInListCells(blockCells[j].listColumn.cellsList, blockCells[i], blockCells[j]);
+
+                }
+
+                if (blockCells[i].ExistsInEnsemble(blockCells[j].listLine))
+                {
+
+                    deleteInListCells(blockCells[j].listColumn.cellsList, blockCells[i], blockCells[j]);
+                }
+
+                if (blockCells[i].ExistsInEnsemble(blockCells[j].listSector))
+                {
+                    deleteInListCells(blockCells[j].listColumn.cellsList, blockCells[i], blockCells[j]);
+                }
+            }
+        }
+
+
+
+
+        public CellsGrid ResolveBlockCells()
+        {
+        
+            List<CellsGrid> testList = new List<CellsGrid>();
+            testList.Add(new CellsGrid(this));
+            
+            Log(ModeText.Verbose, "Save last version");
+
+            Dictionary<string, List<Cell>> counter = this.counBlockCells();
+            List<KeyValuePair<string, List<Cell>>> sortedCells = this.sortedBlockCells(counter);
+
+            List<Cell> blockCells = this.getBlockCells(sortedCells);
+
+
+            Log(ModeText.Verbose, "cellule bloquante");
+            foreach (Cell c in blockCells)
+            {
+                Console.Out.WriteLine(c.hypothesis.Aggregate((stringa, stringb) => stringa + stringb));
+                Log(ModeText.Verbose, String.Format("({0},{1})", c.PosX, c.PosY));
+
+                // Console.ReadLine();
+            }
+            if (blockCells.Count == 0)
+            {
+                if (listHypotheticSudoku.Any(Listgrid => this.EqualsInCell(Listgrid)))
+                {
+                    this.cantResolve = true;
+                    return this;
+                }
+                listHypotheticSudoku.Add(this);
+
+                Log(ModeText.Verbose, "Pure brute force");
+                foreach (KeyValuePair<string, List<Cell>> keyPair in sortedCells)
+                {
+
+                    foreach (Cell c in keyPair.Value)
+                    {
+                        List<String> temp = new List<String>(c.hypothesis);
+                        foreach (String hypothesis in temp)
+                        {
+                            testHypothesis(hypothesis, testList, c);
+                            if (this.isDone())
+                            {
+             
+                                return this;
+
+                            }
+                        }
+                    }
+
+                }
+            }
+            else
+            {
+                for (int i = 0; i < blockCells.Count; i++)
+                {
+
+                    var cell = blockCells[i];
+                    List<String> temp = new List<String>(cell.hypothesis);
+                    testList.Last().cantResolve = false;
+                    // testList.Add(tempgrid);
+                    deleteAllHypothesisFromEnsembleInCell(blockCells, cell);
+                    this.resolveGrid(false);
+
+                    if (testList.Last().isDone())
+                    {
+
+                        return this;
+                    }
+
+
+                    foreach (String Hypothesis in temp)
+                    {
+
+                        testHypothesis(Hypothesis,testList ,cell);
+                        if (this.isDone())
+                        {
+                            return this;
+                        }
+                    }
+
+                    this.cantResolve = true;
+
+                    testList.Remove(testList.Last());
+                }
+            }
+            this.cantResolve = true;
+            return this;
+        }
+
+        private void testHypothesis(string Hypothesis, List<CellsGrid> testList, Cell cell)
+        {
+            testList.Add(new CellsGrid(this));
+            Console.Out.WriteLine(testList.Last());
+            Cell realCell = this[cell.PosX, cell.PosY];
+            this.cantResolve = false;
+            Log(ModeText.Verbose, String.Format("test value {0} at  ({1},{2})", Hypothesis, realCell.PosX, realCell.PosY));
+            
+            realCell.Value = Hypothesis;
+            realCell.diffuseInItsEnsemble();
+            //Console.Out.WriteLine(testList.Last());
+            this.resolveGrid();
+
+
+            if (this.cantResolve == true)
+            {
+                CellsGrid saveGrid = testList.Last();
+                testList.Remove(testList.Last());
+                foreach(Cell saveCell in saveGrid.grid)
+                {
+                    this.grid[saveCell.PosX, saveCell.PosY].Value = saveCell.Value;
+                    this.grid[saveCell.PosX, saveCell.PosY].hypothesis.Clear();
+                    this.grid[saveCell.PosX, saveCell.PosY].hypothesis.AddRange(saveCell.hypothesis);
+                  
+                    
+                }
+
+                testList.Last().cantResolve = true;
+
+                Log(ModeText.Verbose, "RollBack");
+
+            }
         }
 
 

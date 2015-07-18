@@ -185,7 +185,7 @@ namespace Sudoku
 
 
 
-        public  CellsGrid ResolveBlockCells(CellsGrid grid)
+        public  CellsGrid ResolveBlockCells(  CellsGrid grid)
         {
            
             List<CellsGrid> testList = new List<CellsGrid>();

@@ -14,9 +14,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using Sudoku;
+
 namespace Sudoku_esgi {
 
-    public partial class MainWindow : Window ,IObserver<SudokuObject> {
+    public partial class MainWindow : Window ,IObserver<SudokuObject>  {
 
         private int mode = 0;
         private bool stepByStep = false;
@@ -25,13 +26,13 @@ namespace Sudoku_esgi {
 
 
 
-        public ObservableCollection<String> Logs { get; set; }
+      
 
  
 
         public MainWindow() {
             InitializeComponent();
-            Logs = new ObservableCollection<string>();
+           
 
             this.modeLog = ModeText.Error;
             if (OpenFile())
@@ -83,13 +84,16 @@ namespace Sudoku_esgi {
             }
         }
 
-        private void TreatSudoku(object sender, RoutedEventArgs e) {
+        private   void TreatSudoku(object sender, RoutedEventArgs e) {
             if (mode == 0) {
 
             } else if (App.sudokuManager.GridSelected != null && mode == 1) {
 
-               this.modeLog = ModeText.Error;
-               App.sudokuManager.resolveSelected();
+               this.modeLog = ModeText.Verbose;
+               
+               Task task = new Task(new Action(App.sudokuManager.resolveSelected));
+               task.Start();
+              // await Task.Run;
 
             } else
                 MessageBox.Show("Tu dois d'abord sélectionner un sudoku.");
@@ -165,13 +169,14 @@ namespace Sudoku_esgi {
 
         public void OnNext(SudokuObject currentObject)
         {
-            Logs.Add(currentObject.TextLog);
+           
             //Console.WriteLine(currentObject.TextLog);
             if (this.modeLog <= currentObject.lastTextLogLevel)
             {
                 try
                 {
-                    
+
+                    App.sudokuManager.Logs.Add(currentObject.TextLog);
                 }
                 catch (Exception e)
                 {
@@ -203,5 +208,15 @@ namespace Sudoku_esgi {
             GridSudoku.Children.Add(elem);
         }
        * */
+
+
+
+
+
+ 
+
+
     }
+
+
 }

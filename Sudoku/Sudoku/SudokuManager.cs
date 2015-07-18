@@ -11,6 +11,8 @@ namespace Sudoku {
         private string delimiter;
         private int mode;
         public ObservableCollection<CellsGrid> modelList {get; set;}
+        public ObservableCollection<String> Logs { get; set; }
+
         public CellsGrid GridSelected { get; set; }
 
         
@@ -23,7 +25,7 @@ namespace Sudoku {
          **/
         public SudokuManager(string path,IObserver<SudokuObject> MainConsole, int mode = 0 ) : base() {
             this.Path = path;
-     
+            Logs = new ObservableCollection<string>();
             this.ModelList = new ObservableCollection<CellsGrid>();
             this.Mode = mode;
 
@@ -344,13 +346,7 @@ namespace Sudoku {
                 if (!GridSelected.isDone())
                 {
 
-                    GridSelected = GridSelected.resolveGrid();
-                    foreach (Cell c in GridSelected.grid)
-                    {
-                        GridSelected.grid[c.PosX, c.PosY].Value = c.Value;
-                        GridSelected.grid[c.PosX, c.PosY].hypothesis = c.hypothesis;
-                    }
-
+                    GridSelected.resolveGrid();
 
                     if (GridSelected.isDone())
                     {
