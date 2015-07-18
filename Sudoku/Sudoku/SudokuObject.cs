@@ -1,13 +1,14 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
 namespace Sudoku
 {
-    
-    public class SudokuObject
+
+    public class SudokuObject : INotifyPropertyChanged
     {
         protected List<IObserver<SudokuObject>> observers;
         private String textLog_;
@@ -22,10 +23,11 @@ namespace Sudoku
             {
                 textLog_ = value;
                 observers.ForEach(observer => observer.OnNext(this));
+                NotifyPropertyChanged("Log");
             }
         }
 
-       protected internal ModeText lastTextLogLevel;
+       public  ModeText lastTextLogLevel;
 
 
         public SudokuObject()
@@ -52,6 +54,16 @@ namespace Sudoku
             lastTextLogLevel = level;
             TextLog = text;
         }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string p)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(p));
+            }
+        }
+
 
     }
 

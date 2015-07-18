@@ -3,13 +3,14 @@ using System.Collections.Generic;
 using System.Linq;
 using System.IO;
 using System.Text;
+using System.Collections.ObjectModel;
 
 namespace Sudoku {
      public class SudokuManager :  SudokuObject,  IObservable<SudokuObject> {
         private string path;
         private string delimiter;
         private int mode;
-        List<CellsGrid> modelList;
+        public ObservableCollection<CellsGrid> modelList {get; set;}
         public CellsGrid GridSelected { get; set; }
 
         
@@ -23,7 +24,7 @@ namespace Sudoku {
         public SudokuManager(string path,IObserver<SudokuObject> MainConsole, int mode = 0 ) : base() {
             this.Path = path;
      
-            this.ModelList = new List<CellsGrid>();
+            this.ModelList = new ObservableCollection<CellsGrid>();
             this.Mode = mode;
 
             Subscribe(MainConsole);
@@ -34,6 +35,7 @@ namespace Sudoku {
                 return;
             }
             this.verifyIntegrityOfAllSudoku();
+            GridSelected = this.modelList.First();
         }
 
         public string Path {
@@ -46,7 +48,7 @@ namespace Sudoku {
             set { this.delimiter = value; }
         }
 
-        public List<CellsGrid> ModelList {
+        public ObservableCollection<CellsGrid> ModelList {
             get { return this.modelList; }
             set { this.modelList = value; }
         }
@@ -70,7 +72,7 @@ namespace Sudoku {
                     {
                         String name = file.ReadLine();
 
-                        this.Log(ModeText.Warning, name);
+                        
 
 
                         String date = file.ReadLine();
@@ -144,6 +146,8 @@ namespace Sudoku {
                         List<String> maListe = new List<string>(Utility.SplitWithSeparatorEmpty(required));
                         this.ModelList.Add(new CellsGrid(tableCell, maListe, date, name,this.observers));
                         this.ModelList.Last().numberOfDots = numberOfDots;
+                        GridSelected = this.modelList.Last();
+                        this.Log(ModeText.Warning, GridSelected.name);
                          //  Console.Out.WriteLine( this.modelList.Last().ToString());
 
                         if (!error.Equals(String.Empty))
@@ -334,20 +338,32 @@ namespace Sudoku {
 
         public void resolveSelected()
         {
+
             if (GridSelected.isValid)
             {
-                GridSelected = GridSelected.resolveGrid();
-                if (GridSelected.isDone())
+                if (!GridSelected.isDone())
                 {
 
-                    this.Log(ModeText.Verbose, "Le sudoku est résolu.");
-                    this.Log(ModeText.Verbose, GridSelected.ToString());
+                    GridSelected = GridSelected.resolveGrid();
+                    foreach (Cell c in GridSelected.grid)
+                    {
+                        GridSelected.grid[c.PosX, c.PosY].Value = c.Value;
+                        GridSelected.grid[c.PosX, c.PosY].hypothesis = c.hypothesis;
+                    }
 
-                }
-                else
-                {
-                    this.Log(ModeText.Verbose, "Le sudoku est non résolu.");
-                    this.Log(ModeText.Verbose, GridSelected.ToString());
+
+                    if (GridSelected.isDone())
+                    {
+
+                        this.Log(ModeText.Verbose, "Le sudoku est résolu.");
+                        this.Log(ModeText.Verbose, GridSelected.ToString());
+
+                    }
+                    else
+                    {
+                        this.Log(ModeText.Verbose, "Le sudoku est non résolu.");
+                        this.Log(ModeText.Verbose, GridSelected.ToString());
+                    }
                 }
             }
             else
@@ -365,6 +381,8 @@ namespace Sudoku {
         {
             if (modelList[choiceSudokuu].isValid)
             {
+               
+                
                 modelList[choiceSudokuu] = modelList[choiceSudokuu].resolveGrid();
                 if (modelList[choiceSudokuu].isDone())
                 {

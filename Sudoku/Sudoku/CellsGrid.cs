@@ -9,7 +9,7 @@ namespace Sudoku
 	{
        // private static string gridDelimiter = @"//---------------------------";
 
-        protected internal Cell[,] grid
+        public  Cell[,] grid
         {
             get;
             set;

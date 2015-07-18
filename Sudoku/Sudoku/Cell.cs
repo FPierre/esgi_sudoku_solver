@@ -3,11 +3,12 @@ using System.Linq;
 using System.Collections;
 using System.Collections.Generic;
 using System.Text;
+using System.ComponentModel;
 
 
 namespace Sudoku
 {
-	public class Cell : SudokuObject, IObservable<SudokuObject>
+    public class Cell : SudokuObject, IObservable<SudokuObject>, INotifyPropertyChanged
 	{
 
         protected internal Ensemble listColumn
@@ -26,7 +27,7 @@ namespace Sudoku
             set;
         }
 
-		public List<String> hypothesis;
+		public  List<String> hypothesis;
         private String _value;
         public  String Value
         {
@@ -43,6 +44,7 @@ namespace Sudoku
                     this.hypothesis.RemoveRange(0,this.hypothesis.Count);
 
                     this.Log(ModeText.Verbose, this.ToString());
+                    NotifyPropertyChanged("Value");
             }
         }
 
@@ -230,6 +232,15 @@ namespace Sudoku
             result.AppendFormat(" Pos : [{0},{1}] {2}", this.PosX, this.PosY, Environment.NewLine);
 
             return result.ToString();
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string p)
+        {
+            if (PropertyChanged != null)
+            {
+                PropertyChanged(this, new PropertyChangedEventArgs(p));
+            }
         }
 
 

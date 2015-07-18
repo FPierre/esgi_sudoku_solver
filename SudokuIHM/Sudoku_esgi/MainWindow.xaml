@@ -70,7 +70,7 @@
             </ComboBox>
             <ComboBox Name="SelectSudoku" Margin="5"
                         IsEditable="True" IsReadOnly="True" Text="Sélectionne un sudoku"
-                        ItemsSource="{Binding Path=ModelList}" SelectedItem="{Binding Path=GridSelected}"
+                        ItemsSource="{Binding Path=modelList}" SelectedItem="{Binding Path=GridSelected}"
                         DisplayMemberPath="name" SelectedValuePath="name"
                         SelectionChanged="SelectSudokuChanged"/>
         </StackPanel>
