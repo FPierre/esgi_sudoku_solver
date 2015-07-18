@@ -5,22 +5,13 @@ using System.Data;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows;
-using Sudoku;
 
-namespace Sudoku_esgi {
+namespace WpfApplication1
+{
+    /// <summary>
+    /// Logique d'interaction pour App.xaml
+    /// </summary>
     public partial class App : Application
     {
-
-
-
-
-
-        
-
-        static App() {
-
-        }
-
-
     }
 }

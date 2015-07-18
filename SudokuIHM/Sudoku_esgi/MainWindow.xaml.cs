@@ -12,17 +12,61 @@ using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Navigation;
 using System.Windows.Shapes;
-
+using Microsoft.Win32;
+using Sudoku;
 namespace Sudoku_esgi {
 
-    public partial class MainWindow : Window {
+    public partial class MainWindow : Window ,IObserver<SudokuObject> {
 
         private int mode = 0;
+        private bool stepByStep = false;
+        public String file;
+
+        SudokuManager sudokuManager;
+
+
+        public ObservableCollection<String> Logs { get; set; }
+        public ObservableCollection<CellsGrid> ModelList { get; set; }
+ 
 
         public MainWindow() {
             InitializeComponent();
-            DataContext = App.SudokuManager;
+            Logs = new ObservableCollection<string>();
+            ModelList = new ObservableCollection<CellsGrid>();
+
+            if (OpenFile())
+            {
+                DataContext = sudokuManager;
+                foreach( CellsGrid grid in  sudokuManager.ModelList)
+                {
+                    ModelList.Add(grid);
+                }
+            }
+            else
+            {
+                this.Close();
+            }
         }
+
+
+        public bool OpenFile()
+        {
+            
+            OpenFileDialog openFileDialog = new OpenFileDialog();
+            if (openFileDialog.ShowDialog() == true)
+            {
+                file = openFileDialog.FileName;
+                if(file.EndsWith(".sud"))
+                {
+
+                    sudokuManager = new SudokuManager(file, this, 0);
+                   return true;
+                }
+            }
+
+            return false;
+        }
+
 
         private void StepByStepUnchecked(object sender, RoutedEventArgs e) {
             ActionStep.Visibility = Visibility.Hidden;
@@ -46,8 +90,8 @@ namespace Sudoku_esgi {
         private void TreatSudoku(object sender, RoutedEventArgs e) {
             if (mode == 0) {
 
-            } else if (App.SudokuManager.GridSelected != null && mode == 1) {
-                App.SudokuManager.resolveSelected(); 
+            } else if (sudokuManager.GridSelected != null && mode == 1) {
+                sudokuManager.resolveSelected(); 
             } else
                 MessageBox.Show("Tu dois d'abord sélectionner un sudoku.");
         }
@@ -64,7 +108,7 @@ namespace Sudoku_esgi {
             GridSudoku.Children.Clear();
             GridSudoku.ColumnDefinitions.Clear();
             GridSudoku.RowDefinitions.Clear();
-            CellsGrid g = App.SudokuManager.GridSelected;
+            CellsGrid g = sudokuManager.GridSelected;
 
             for (int i = 0; i < g.size; ++i) {
                 GridSudoku.ColumnDefinitions.Add(new ColumnDefinition());
@@ -99,6 +143,25 @@ namespace Sudoku_esgi {
             Grid.SetRow(elem, i);
             Grid.SetColumn(elem, j);
             return elem;
+        }
+
+        public void OnNext(SudokuObject currentObject)
+        {
+            Logs.Add(currentObject.TextLog);
+        }
+
+
+
+        // Usually called when a transmission is complete. Not implemented.
+        public void OnCompleted()
+        {
+            throw new NotImplementedException();
+        }
+
+        // Usually called when there was an error. Didn't implement.
+        public void OnError(Exception error)
+        {
+            throw new NotImplementedException();
         }
         
         public void UpdateGridCase(string s, int i, int j) {

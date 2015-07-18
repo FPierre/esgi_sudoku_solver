@@ -10,6 +10,7 @@ namespace Sudoku {
         private string delimiter;
         private int mode;
         List<CellsGrid> modelList;
+        public CellsGrid GridSelected { get; set; }
 
         
 
@@ -213,14 +214,13 @@ namespace Sudoku {
 
         public void resolveAll()
         {
-
-            for(int i = 0; i < modelList.Count ; i++)
+            for (int i = 0; i < ModelList.Count; i++)
             {
-                resolve(i);
+                GridSelected = ModelList[i];
+                resolveSelected();
             }
-
-                
         }
+
 /*
         private string checkAllSudoku(int mode) {
             const String error = "Le sudoku est invalide {0}";
@@ -290,7 +290,7 @@ namespace Sudoku {
 
 
 
-        internal int displayNames()
+        public int displayNames()
         {
             int filter = 50;
             int i = 1;
@@ -332,6 +332,34 @@ namespace Sudoku {
             return -1;
         }
 
+        public void resolveSelected()
+        {
+            if (GridSelected.isValid)
+            {
+                GridSelected = GridSelected.resolveGrid();
+                if (GridSelected.isDone())
+                {
+
+                    this.Log(ModeText.Verbose, "Le sudoku est résolu.");
+                    this.Log(ModeText.Verbose, GridSelected.ToString());
+
+                }
+                else
+                {
+                    this.Log(ModeText.Verbose, "Le sudoku est non résolu.");
+                    this.Log(ModeText.Verbose, GridSelected.ToString());
+                }
+            }
+            else
+            {
+
+                String text = String.Format("Le sudoku {0} est invalide.", GridSelected.name);
+                this.Log(ModeText.Verbose, text);
+                this.Log(ModeText.Verbose, GridSelected.error);
+
+            }
+        }
+
 
         internal void resolve(int choiceSudokuu)
         {
@@ -360,5 +388,6 @@ namespace Sudoku {
 
             }
         }
+
      }
 }

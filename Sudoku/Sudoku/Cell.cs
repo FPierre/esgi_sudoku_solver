@@ -28,7 +28,7 @@ namespace Sudoku
 
 		protected internal List<String> hypothesis;
         private String _value;
-        protected internal String Value
+        public  String Value
         {
 
             get

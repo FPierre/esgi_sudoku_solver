@@ -12,7 +12,7 @@ namespace Sudoku
         protected List<IObserver<SudokuObject>> observers;
         private String textLog_;
    
-       protected internal String TextLog
+       public  String TextLog
         {
             get
             {

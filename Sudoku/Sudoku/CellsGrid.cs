@@ -14,7 +14,7 @@ namespace Sudoku
             get;
             set;
         }
-         protected internal int size
+         public  int size
         {
             get;
             set;
