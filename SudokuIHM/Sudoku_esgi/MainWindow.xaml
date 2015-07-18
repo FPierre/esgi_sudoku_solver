@@ -1,8 +1,46 @@
 ﻿<Window x:Class="Sudoku_esgi.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:Sudoku_esgi="clr-namespace:Sudoku_esgi"
         Title="MainWindow" Height="740" Width="960">
-    <Grid Margin="5">
+    <!-- Styles des éléments de la window -->
+    <Window.Resources>
+        <Style x:Key="RedButton" TargetType="{x:Type Button}">
+            <Setter Property="OverridesDefaultStyle" Value="True" />
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Firebrick"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="{x:Type Button}">
+                        <Border Padding="5" Background="{TemplateBinding Background}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+            <Style.Triggers>
+                <Trigger Property="IsMouseOver" Value="True">
+                    <Setter Property="Background" Value="Red"/>
+                </Trigger>
+            </Style.Triggers>
+        </Style>
+        <Style x:Key="RedBlockOpacity" TargetType="{x:Type TextBox}">
+            <Setter Property="FontSize" Value="16"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="Background" Value="Firebrick"/>
+            <Setter Property="Opacity" Value=".8"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+            <Setter Property="VerticalAlignment" Value="Stretch"/>
+            <Setter Property="TextAlignment" Value="Center"/>
+            <Setter Property="VerticalContentAlignment" Value="Center"/>
+            <Setter Property="IsReadOnly" Value="True" />
+            <Setter Property="IsEnabled" Value="False"/>
+        </Style>
+    </Window.Resources>
+    
+    <!-- Affichage de la window -->
+    <Grid Margin="5" x:Name="ParentWindow">
         <Grid.ColumnDefinitions>
             <ColumnDefinition Width="6.5*"/>
             <ColumnDefinition Width="3.5*"/>
@@ -11,44 +49,36 @@
             <RowDefinition Height="1*"/>
             <RowDefinition Height="9*"/>
         </Grid.RowDefinitions>
-        
+
         <!-- Titre et infos -->
         <StackPanel Grid.Row="0" Grid.Column="0">
-            <!--="{Binding SudokuSelect.Name}"-->
-            <TextBlock Name="NameSudoku" Text="{Binding GridSelect.Name}"
-                       Margin="5,5,5,0" FontWeight="Bold" FontSize="16"/>
-            <TextBlock Name="DateSudoku" Text="{Binding GridSelect.Date}" 
-                       Margin="5,0,5,0" FontSize="14"/>
-            <TextBlock Name="RequiredSudoku" Text="{Binding GridSelect.Required, StringFormat='Modèle requis : {0}'}" 
-                       Margin="5,0,5,0" FontSize="14" Foreground="Red"/>
+            <TextBlock Name="NameSudoku" Text="{Binding GridSelected.name}"
+                        Margin="5,5,5,0" FontWeight="Bold" FontSize="16"/>
+            <TextBlock Name="DateSudoku" Text="{Binding GridSelected.date}" 
+                        Margin="5,0,5,0" FontSize="14"/>
+            <TextBlock Name="RequiredSudoku" Text="{Binding GridSelected.required, StringFormat='Modèle requis : {0}'}" 
+                        Margin="5,0,5,0" FontSize="14" Foreground="Red"/>
         </StackPanel>
-        
+
         <!-- Sélection des sudokus -->
         <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Top">
             <ComboBox Name="SelectMode" Margin="5"
-                      IsEditable="True" IsReadOnly="True"
-                      SelectionChanged="SelectModeChanged">
-                <ComboBoxItem Content="Validation" Name="Validation" IsSelected="True"/>
+                        IsEditable="True" IsReadOnly="True" Text="Sélectionne un mode"
+                        SelectionChanged="SelectModeChanged">
+                <ComboBoxItem Content="Validation" Name="Validation"/>
                 <ComboBoxItem Content="Résolution" Name="Résolution"/>
             </ComboBox>
             <ComboBox Name="SelectSudoku" Margin="5"
-                      IsEditable="True" IsReadOnly="True" Text="Sélectionne un sudoku"
-                      ItemsSource="{Binding GridList}" SelectedItem="{Binding GridSelect}"
-                      SelectionChanged="SelectSudokuChanged">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Padding="5,0,5,0" Text="{Binding Name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+                        IsEditable="True" IsReadOnly="True" Text="Sélectionne un sudoku"
+                        ItemsSource="{Binding Path=ModelList}" SelectedItem="{Binding Path=GridSelected}"
+                        DisplayMemberPath="name" SelectedValuePath="name"
+                        SelectionChanged="SelectSudokuChanged"/>
         </StackPanel>
-        
+
         <!-- Grille de sudoku -->
         <Grid Grid.Column="0" Grid.Row="1" Grid.RowSpan="2" Margin="5"
               Name="GridSudoku" />
-        
+
         <!-- Logs et bouton d'actions -->
         <Grid Grid.Row="1" Grid.Column="2" Margin="5">
             <Grid.ColumnDefinitions>
@@ -58,23 +88,24 @@
                 <RowDefinition Height="8.75*"/>
                 <RowDefinition Height="1.25*"/>
             </Grid.RowDefinitions>
-            
+
             <!-- Logs -->
             <ListBox Grid.Row="0" Grid.Column="0" Width="Auto" Margin="0,0,0,5"
-                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                     ItemsSource="{Binding Logs}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Padding="5,0,5,0" Text="" />
+                            <TextBlock Padding="5,0,5,0" Text="{Binding Path=TextLog}" />
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
             </ListBox>
-            
+
             <!-- Actions -->
             <StackPanel Grid.Row="1" Grid.Column="0"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom" >
-                <Grid Margin="5">
+                <Grid Margin="0,5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*"/>
                         <ColumnDefinition Width="1*"/>
@@ -82,7 +113,7 @@
                     <Grid.RowDefinitions>
                         <RowDefinition Height="*"/>
                     </Grid.RowDefinitions>
-                    
+
                     <CheckBox Grid.Row="0" Grid.Column="0" Height="Auto"
                               HorizontalAlignment="Left" VerticalAlignment="Center"
                               Content="Faire étape par étape"
@@ -92,11 +123,11 @@
                             Name="ActionStep" Content="Suivant" Click="GoNextStep"
                             Visibility="Hidden"/>
                 </Grid>
-                <Button Width="Auto" Height="Auto" Padding="3"
+                <Button Width="Auto" Height="Auto"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
-                        Name="ActionSudoku" Content="{Binding NextAction}" FontSize="16" 
-                        Foreground="White" Background="Red"
-                        Click="TreatSudoku"/>
+                        Name="ActionSudoku"
+                        Click="TreatSudoku" Style="{StaticResource RedButton}"
+                        Visibility="Hidden"/>
             </StackPanel>
         </Grid>
     </Grid>
