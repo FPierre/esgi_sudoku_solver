@@ -61,7 +61,6 @@ namespace Sudoku_esgi
         public Cell(Ensemble listColumn, Ensemble listLine, Ensemble listSector, String value, List<String> hypothesis, int posx, int posy, List<IObserver<SudokuObject>> MainConsole)
             : this( MainConsole)
 		{
-  
 			this.listColumn = listColumn;
 			this.listLine = listLine;
 			this.listSector = listSector;
@@ -70,8 +69,6 @@ namespace Sudoku_esgi
             this.PosX = posx;
             this.PosY = posy;
             this.Value = value;
-            
-            
 		}
 
         private Cell(String value, List<String> hypothesis,List<IObserver<SudokuObject>> MainConsole)

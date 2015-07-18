@@ -4,12 +4,16 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.IO;
 using System.Text;
+using System.Collections.Specialized;
+using System.ComponentModel;
+using System.Windows;
 
 namespace Sudoku_esgi {
-     public class SudokuManager :  SudokuObject,  IObservable<SudokuObject> {
+    public class SudokuManager : SudokuObject, IObservable<SudokuObject>, IObserver<SudokuObject> {
         private string path;
         private string delimiter;
         private int mode;
+        public ObservableCollection<SudokuObject> Logs { get; set; }
         public ObservableCollection<CellsGrid> ModelList { get; set; }
         public CellsGrid GridSelected { get; set; }
 
@@ -21,9 +25,10 @@ namespace Sudoku_esgi {
          **/
         public SudokuManager(string path, IObserver<SudokuObject> MainConsole, int mode = 0) : base() {
             this.Path = path;
-
+            this.Logs = new ObservableCollection<SudokuObject>();
             this.ModelList = new ObservableCollection<CellsGrid>();
             this.Mode = mode;
+
             if (mode == 1)
                 ConsoleMenu.StepByStep = true;
             ConsoleMenu.mode = ModeText.Warning;
@@ -35,6 +40,7 @@ namespace Sudoku_esgi {
                 Console.WriteLine("Erreur: " + this.Path + " n'existe pas.");
                 return;
             }
+
             this.verifyIntegrityOfAllSudoku();
         }
 
@@ -91,7 +97,7 @@ namespace Sudoku_esgi {
                                 double sqrtNumber = Math.Sqrt((Convert.ToDouble(size)));
                                 int indexSector = ((int)(Math.Floor(i / sqrtNumber) * sqrtNumber + Math.Floor(j / sqrtNumber)));
                                 verifyEnsemble(MesEnsembleSector, indexSector);
-                                myCell = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], tempLine[j], new List<String>(Utility.SplitWithSeparatorEmpty(required)) , i , j,this.observers); ;
+                                myCell = new Cell(MesEnsembleColumn[j], MesEnsembleLine[i], MesEnsembleSector[indexSector], tempLine[j], new List<String>(Utility.SplitWithSeparatorEmpty(required)), i , j, this.observers);
 
                                 if (required.Contains(tempLine[j]) || tempLine[j].Equals("."))
                                 {
@@ -122,7 +128,7 @@ namespace Sudoku_esgi {
                                 {
                                     if (getError == false)
                                     {
-                                        error = String.Format("grill : {0} {1} la cellule à l'index ({2}, {3}) n'est pas comprise dans les valeurs requises {4} {5}, Values {6}", name, Environment.NewLine, i, j, required, Environment.NewLine, tempLine[j]);
+                                        error = String.Format("grille : {0} {1} la cellule à l'index ({2}, {3}) n'est pas comprise dans les valeurs requises {4} {5}, Values {6}", name, Environment.NewLine, i, j, required, Environment.NewLine, tempLine[j]);
                                         getError = true;
                                     }
                                 }
@@ -134,7 +140,7 @@ namespace Sudoku_esgi {
 
                        
                         List<String> maListe = new List<string>(Utility.SplitWithSeparatorEmpty(required));
-                        this.ModelList.Add(new CellsGrid(tableCell, maListe, date, name,this.observers));
+                        this.ModelList.Add(new CellsGrid(tableCell, maListe, date, name, this.observers));
                         this.ModelList.Last().numberOfDots = numberOfDots;
                          //  Console.Out.WriteLine( this.modelList.Last().ToString());
 
@@ -206,82 +212,12 @@ namespace Sudoku_esgi {
 
         public void resolveAll()
         {
-
             for(int i = 0; i < ModelList.Count ; i++)
             {
-                resolve(i);
+                GridSelected = ModelList[i];
+                resolveSelected();
             }
-
-                
         }
-/*
-        private string checkAllSudoku(int mode) {
-            const String error = "Le sudoku est invalide {0}";
-
-            foreach (CellsGrid model in this.ModelList) {
-                model.ToString();
-
-                // Si le sudoku n'est pas un format supporté tel que 9x9, 16x16 ou 25x25
-                if (model.size % 
-                    Convert.ToInt32(Math.Floor(Math.Sqrt(model.size))) != 0) {
-                        model.isValid = false;
-                        model.error += String.Format(error, "(format non supporté, devrait être 9x9, 16x16 ou 25x25).");
-
-                    //return String.Format(error, "(format non supporté, devrait être 9x9, 16x16 ou 25x25).");
-                }
-
-                // Compteur de la taille des lignes et colonnes
-                int counterLine = 0, counterColumn = 0;
-                // Liste pour futur check de caractères
-                List<string> allValues = new List<string>();
-                string required = model.required;
-                // Ajout du "." au pattern pour la résolution
-                if (mode == 1) 
-                    required += ".";
-
-                for (int i=0; i < model.size; ++i) {
-                    if (counterLine > model.size)
-                    {
-                          model.isValid = false;
-                          model.error += String.Format(error, "(une ligne est plus grande que le pattern).");
-                    }
-                    for (int j=0; j < model.size; ++j) {
-                        if (counterColumn > model.size)
-                        {
-                            model.isValid = false;
-                            model.error += String.Format(error, "(une colonne est plus grande que le pattern).");
-                        }
-
-
-                        string s = model[i, j].value;
-
-                        // Comparaison des valeurs au pattern
-                        if (!required.Contains(s))
-                        {
-                            model.isValid = false;
-                            model.error += String.Format(error, "(des valeurs sont manquantes).");
-                        }
-
-                        // Ajoute la valeur dans la liste pour les check
-                        allValues.Add(s);
-                        counterColumn++;
-                    }
-                    counterColumn = 0;
-                    counterLine++;
-                }
-                counterLine = 0;
-                
-                // Vérifier qu'il n'y ait pas que des "."
-                if (allValues.Count(c => c == ".") == model.size) {
-                    return String.Format(error, "(toutes les valeurs sont vides).");
-                }
-
-            }
-            return "Le sudoku est valide.";
-        } 
- */
-
-
 
         internal int displayNames()
         {
@@ -325,33 +261,33 @@ namespace Sudoku_esgi {
             return -1;
         }
 
+        internal void resolveSelected() {
+            if (GridSelected.isValid) {
+                GridSelected = GridSelected.resolveGrid();
+                if (GridSelected.isDone()) {
 
-        internal void resolve(int choiceSudokuu)
-        {
-            if (ModelList[choiceSudokuu].isValid)
-            {
-                ModelList[choiceSudokuu] = ModelList[choiceSudokuu].resolveGrid();
-                if (ModelList[choiceSudokuu].isDone())
-                {
+                    this.Log(ModeText.Verbose, "Le sudoku est résolu.");
+                    this.Log(ModeText.Verbose, GridSelected.ToString());
 
-                    this.Log(ModeText.Verbose, "Le sudoku est résolu");
-                    this.Log(ModeText.Verbose, ModelList[choiceSudokuu].ToString());
-
+                } else {
+                    this.Log(ModeText.Verbose, "Le sudoku est non résolu.");
+                    this.Log(ModeText.Verbose, GridSelected.ToString());
                 }
-                else
-                {
-                    this.Log(ModeText.Verbose, "Le sudoku est non résolu");
-                    this.Log(ModeText.Verbose, ModelList[choiceSudokuu].ToString());
-                }
-            }
-            else
-            {
+            } else {
 
-                String text = String.Format("Sudoku {0} is invalid ", ModelList[choiceSudokuu].name);
+                String text = String.Format("Le sudoku {0} est invalide.", GridSelected.name);
                 this.Log(ModeText.Verbose, text);
-                this.Log(ModeText.Verbose, ModelList[choiceSudokuu].error);
+                this.Log(ModeText.Verbose, GridSelected.error);
 
             }
         }
-     }
+
+        public void OnNext(SudokuObject currentObject) {
+            Logs.Add(currentObject);
+        }
+
+        public void OnCompleted() { throw new NotImplementedException(); }
+
+        public void OnError(Exception error) { throw new NotImplementedException(); }
+    }
 }

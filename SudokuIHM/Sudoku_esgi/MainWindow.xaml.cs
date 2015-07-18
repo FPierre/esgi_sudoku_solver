@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.ObjectModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -16,6 +17,8 @@ namespace Sudoku_esgi {
 
     public partial class MainWindow : Window {
 
+        private int mode = 0;
+
         public MainWindow() {
             InitializeComponent();
             DataContext = App.SudokuManager;
@@ -31,14 +34,26 @@ namespace Sudoku_esgi {
 
         private void SelectModeChanged(object sender, SelectionChangedEventArgs e) {
             ComboBoxItem selectedMode = (ComboBoxItem) SelectMode.SelectedItem;
-            ChangeButtonContent(selectedMode.Content.ToString());
-        }
+            mode = SelectMode.SelectedIndex;
+            //App.SudokuManager = new SudokuManager(App.selectFile(), App.Console, SelectMode.SelectedIndex);
 
-        private void ChangeButtonContent(String s) {
             if (ActionSudoku != null) {
                 ActionSudoku.Visibility = Visibility.Visible;
-                ActionSudoku.Content = s;
+                ActionSudoku.Content = selectedMode.Content.ToString();
             }
+        }
+
+        private void TreatSudoku(object sender, RoutedEventArgs e) {
+            if (mode == 0) {
+
+            } else if (App.SudokuManager.GridSelected != null && mode == 1) {
+                App.SudokuManager.resolveSelected(); 
+            } else
+                MessageBox.Show("Tu dois d'abord sélectionner un sudoku.");
+        }
+
+        private void GoNextStep(object sender, RoutedEventArgs e) {
+            // Traitement step-by-step
         }
 
         private void SelectSudokuChanged(object sender, SelectionChangedEventArgs e) {
@@ -58,15 +73,14 @@ namespace Sudoku_esgi {
 
             for (int i = 0; i < g.size; ++i) {
                 for (int j = 0; j < g.size; j++) {
-                    FrameworkElement elem = CreateGridCase(g, i, j);
+                    FrameworkElement elem = CreateGridCase( g[i, j].Value, i, j );
                     GridSudoku.Children.Add(elem);
                 }
             }
         }
 
-        private FrameworkElement CreateGridCase(CellsGrid g, int i, int j) {
+        private FrameworkElement CreateGridCase(string s, int i, int j) {
             FrameworkElement elem;
-            string s = g[i, j].Value;
             if (s != ".") {
                 elem = new TextBox();
                 TextBox rect = (TextBox) elem;
@@ -86,13 +100,13 @@ namespace Sudoku_esgi {
             Grid.SetColumn(elem, j);
             return elem;
         }
-
-        private void TreatSudoku(object sender, RoutedEventArgs e) {
-            // Traitement sur la grille
-        }
-
-        private void GoNextStep(object sender, RoutedEventArgs e) {
-            // Traitement step-by-step
+        
+        public void UpdateGridCase(string s, int i, int j) {
+            FrameworkElement elem = GridSudoku.Children.OfType<FrameworkElement>()
+                                    .FirstOrDefault(child => Grid.GetRow(child) == i && Grid.GetColumn(child) == j);
+            GridSudoku.Children.Remove(elem);
+            elem = CreateGridCase(s, i, j);
+            GridSudoku.Children.Add(elem);
         }
     }
 }

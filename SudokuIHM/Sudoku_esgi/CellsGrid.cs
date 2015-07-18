@@ -253,7 +253,8 @@ namespace Sudoku_esgi
                     else
                     {
                         
-                        error = String.Format("grille : {3} {4}la cellule à l'index {0},{1} a une valeur semblable dans sa ligne, dans sa colonne ou dans son secteur", i, j,this.name,Environment.NewLine);
+                        error = String.Format("grille : {3} {4} la cellule à l'index {0}, {1} a une valeur semblable dans sa ligne,"
+                                    + " dans sa colonne ou dans son secteur", i, j, this.name, Environment.NewLine);
 
                         this.Log(ModeText.Error, error);
 
@@ -281,32 +282,26 @@ namespace Sudoku_esgi
             return true;
         }
 
-
-        public override string ToString()
+        public override string ToString() 
         {
-            /**StringBuilder text = new StringBuilder() ;
+            StringBuilder text = new StringBuilder();
             text.Append(name);
-
             text.Append(Environment.NewLine);
             text.Append(date);
             text.Append(Environment.NewLine);
-            for(int i = 0 ; i < size; i++)
-            {
-                for(int j = 0 ; j < size ; j++)
-                {
+            for (int i = 0; i < size; i++) {
+                for (int j = 0; j < size; j++) {
                     text.AppendFormat("{0,3}", grid[i, j].Value);
-                    if (grid[i, j].hypothesis.Count != 0 )
-                        text.AppendFormat("({0})", grid[i, j].hypothesis.Aggregate((stringa,stringb) => stringa+ stringb));
-                   // text.AppendFormat("({0})", grid[i, j].hypothesis.Aggregate((stringa, stringb) => stringa + stringb));
+                    if (grid[i, j].hypothesis.Count != 0)
+                        text.AppendFormat("({0})", grid[i, j].hypothesis.Aggregate((stringa, stringb) => stringa + stringb));
+/**                    else
+                       App.SudokuManager.UpdateGridCase(grid[i, j].Value, i, j);    **/
                 }
                 text.Append(Environment.NewLine);
             }
             text.Append(Environment.NewLine);
-            return text.ToString();**/
-
-            return String.Format("{0} ({1})", name, date);
+            return text.ToString();
         }
-
 
 
         public Cell Find(Cell cell , int pos)

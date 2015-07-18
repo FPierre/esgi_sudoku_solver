@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 namespace Sudoku_esgi
 {
     public enum ModeText { Verbose, Warning, Error };
-    public class ConsoleMenu : ViewObject,IObserver<SudokuObject> 
+    public class ConsoleMenu : ViewObject, IObserver<SudokuObject> 
     {
 
         private  String choice;
@@ -62,12 +62,13 @@ namespace Sudoku_esgi
 
                     if (choiceSudokuu < 0)
                     {
-                        Console.WriteLine("Vous n'avez riens choisis");
+                        Console.WriteLine("Vous n'avez rien choisi.");
                         return;
                     }
                     else
                     {
-                        manager.resolve(choiceSudokuu);
+                        manager.GridSelected = manager.ModelList[choiceSudokuu];
+                        manager.resolveSelected();
                     }
                     
                     break;
@@ -131,7 +132,7 @@ namespace Sudoku_esgi
         public int chooseSudoku()
         {
 
-            Console.WriteLine("Choissisez quel sudoku vous voullez resoudre");
+            Console.WriteLine("Quel sudoku voulez-vous resoudre :");
             int choice = this.manager.displayNames();
             
                 

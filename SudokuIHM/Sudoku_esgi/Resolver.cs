@@ -300,7 +300,7 @@ namespace Sudoku_esgi
 								myCell.Value = hypothesisTest.ToString();
 								if (grid.isDone ()) {
 									Console.WriteLine ("solution trouvée!");
-									grid.ToString ();
+                                    grid.ToString();
 
 								} else {
                                     Console.Out.WriteLine("recursive solution");

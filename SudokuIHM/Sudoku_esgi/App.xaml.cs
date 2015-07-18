@@ -9,10 +9,11 @@ using System.Windows;
 namespace Sudoku_esgi {
     public partial class App : Application {
         public static SudokuManager SudokuManager { get; set; }
+        public static ConsoleMenu MainConsole { get; set; }
 
         static App() {
-            ConsoleMenu console = new ConsoleMenu();
-            SudokuManager = new SudokuManager(selectFile(), console);
+            MainConsole = new ConsoleMenu();
+            SudokuManager = new SudokuManager(App.selectFile(), MainConsole);
         }
 
         public static string selectFile() {

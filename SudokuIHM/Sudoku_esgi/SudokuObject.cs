@@ -12,7 +12,7 @@ namespace Sudoku_esgi
         protected List<IObserver<SudokuObject>> observers;
         private String textLog_;
    
-       protected internal String TextLog
+       public string TextLog
         {
             get
             {
@@ -32,6 +32,7 @@ namespace Sudoku_esgi
         {
             observers = new List<IObserver<SudokuObject>>();
         }
+
         public IDisposable Subscribe(IObserver<SudokuObject> observer)
         {
             if (!observers.Contains(observer))

@@ -29,7 +29,6 @@
             <Setter Property="FontSize" Value="16"/>
             <Setter Property="Foreground" Value="White"/>
             <Setter Property="Background" Value="Firebrick"/>
-            <Setter Property="BorderBrush" Value="Firebrick"/>
             <Setter Property="Opacity" Value=".8"/>
             <Setter Property="HorizontalAlignment" Value="Stretch"/>
             <Setter Property="VerticalAlignment" Value="Stretch"/>
@@ -71,16 +70,9 @@
             </ComboBox>
             <ComboBox Name="SelectSudoku" Margin="5"
                         IsEditable="True" IsReadOnly="True" Text="Sélectionne un sudoku"
-                        ItemsSource="{Binding ModelList}" SelectedItem="{Binding GridSelected}"
-                        SelectionChanged="SelectSudokuChanged">
-                <ComboBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Padding="5,0,5,0" Text="{Binding name}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ComboBox.ItemTemplate>
-            </ComboBox>
+                        ItemsSource="{Binding Path=ModelList}" SelectedItem="{Binding Path=GridSelected}"
+                        DisplayMemberPath="name" SelectedValuePath="name"
+                        SelectionChanged="SelectSudokuChanged"/>
         </StackPanel>
 
         <!-- Grille de sudoku -->
@@ -99,11 +91,12 @@
 
             <!-- Logs -->
             <ListBox Grid.Row="0" Grid.Column="0" Width="Auto" Margin="0,0,0,5"
-                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch">
+                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                     ItemsSource="{Binding Logs}">
                 <ListBox.ItemTemplate>
                     <DataTemplate>
                         <StackPanel Orientation="Horizontal">
-                            <TextBlock Padding="5,0,5,0" Text="" />
+                            <TextBlock Padding="5,0,5,0" Text="{Binding Path=TextLog}" />
                         </StackPanel>
                     </DataTemplate>
                 </ListBox.ItemTemplate>
@@ -132,7 +125,7 @@
                 </Grid>
                 <Button Width="Auto" Height="Auto"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
-                        Name="ActionSudoku" Content="{Binding NextAction}"
+                        Name="ActionSudoku"
                         Click="TreatSudoku" Style="{StaticResource RedButton}"
                         Visibility="Hidden"/>
             </StackPanel>
