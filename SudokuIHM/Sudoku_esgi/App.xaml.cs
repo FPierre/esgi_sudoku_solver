@@ -10,17 +10,10 @@ using Sudoku;
 namespace Sudoku_esgi {
     public partial class App : Application
     {
-            public static SudokuManager sudokuManager;
-
-
-
-
-        
+        public static SudokuManager sudokuManager;
 
         static App() {
 
         }
-
-
     }
 }

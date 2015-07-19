@@ -17,60 +17,43 @@ using Sudoku;
 
 namespace Sudoku_esgi {
 
-    public partial class MainWindow : Window ,IObserver<SudokuObject>  {
+    public partial class MainWindow : Window, IObserver<SudokuObject> {
 
         private int mode = 0;
         private bool stepByStep = false;
         public String file;
         public  ModeText modeLog = ModeText.Warning;
 
-
-
-      
-
- 
-
         public MainWindow() {
             InitializeComponent();
-           
-
             this.modeLog = ModeText.Error;
-            if (OpenFile())
-            {
+            if (OpenFile()) {
                 DataContext = App.sudokuManager;
-  
-            }
-            else
-            {
+            } else {
                 this.Close();
             }
         }
 
-
-        public bool OpenFile()
-        {
-            
+        public bool OpenFile() {
             OpenFileDialog openFileDialog = new OpenFileDialog();
-            if (openFileDialog.ShowDialog() == true)
-            {
+            if (openFileDialog.ShowDialog() == true) {
                 file = openFileDialog.FileName;
-                if(file.EndsWith(".sud"))
-                {
+
+                if(file.EndsWith(".sud")) {
                     App.sudokuManager = new SudokuManager(file, this, 0);
-                   return true;
+                    return true;
                 }
             }
 
             return false;
         }
 
-
         private void StepByStepUnchecked(object sender, RoutedEventArgs e) {
-            ActionStep.Visibility = Visibility.Hidden;
+            ButtonActionStep.Visibility = Visibility.Hidden;
         }
 
         private void StepByStepChecked(object sender, RoutedEventArgs e) {
-            ActionStep.Visibility = Visibility.Visible;
+            ButtonActionStep.Visibility = Visibility.Visible;
         }
 
         private void SelectModeChanged(object sender, SelectionChangedEventArgs e) {
@@ -80,21 +63,17 @@ namespace Sudoku_esgi {
 
             if (ActionSudoku != null) {
                 ActionSudoku.Visibility = Visibility.Visible;
-                ActionSudoku.Content = selectedMode.Content.ToString();
+                ButtonActionMode.Content = selectedMode.Content.ToString();
             }
         }
 
-        private   void TreatSudoku(object sender, RoutedEventArgs e) {
+        private void TreatSudoku(object sender, RoutedEventArgs e) {
             if (mode == 0) {
 
             } else if (App.sudokuManager.GridSelected != null && mode == 1) {
-
                this.modeLog = ModeText.Verbose;
-               
                Task task = new Task(new Action(App.sudokuManager.resolveSelected));
                task.Start();
-              // await Task.Run;
-
             } else
                 MessageBox.Show("Tu dois d'abord sélectionner un sudoku.");
         }
@@ -112,19 +91,14 @@ namespace Sudoku_esgi {
             GridSudoku.ColumnDefinitions.Clear();
             GridSudoku.RowDefinitions.Clear();
 
-
-
-            for (int i = 0; i < App.sudokuManager.GridSelected.size; ++i)
-            {
+            for (int i = 0; i < App.sudokuManager.GridSelected.size; ++i) {
                 GridSudoku.ColumnDefinitions.Add(new ColumnDefinition());
                 GridSudoku.RowDefinitions.Add(new RowDefinition());
             }
 
             for (int i = 0; i < App.sudokuManager.GridSelected.size; ++i) {
-                for (int j = 0; j < App.sudokuManager.GridSelected.size; j++)
-                {
+                for (int j = 0; j < App.sudokuManager.GridSelected.size; j++) {
                     FrameworkElement elem = CreateGridCase(App.sudokuManager.GridSelected[i, j], i, j);
-              
                     GridSudoku.Children.Add(elem);
                 }
             }
@@ -153,7 +127,6 @@ namespace Sudoku_esgi {
                 };
                  * */
                 elem.DataContext = c;
-                btn.Content = c.Value;
                 Binding myBinding = new Binding();
                 myBinding.Source = c;
                 myBinding.Path = new PropertyPath("Value");
@@ -166,57 +139,5 @@ namespace Sudoku_esgi {
             Grid.SetColumn(elem, j);
             return elem;
         }
-
-        public void OnNext(SudokuObject currentObject)
-        {
-           
-            //Console.WriteLine(currentObject.TextLog);
-            if (this.modeLog <= currentObject.lastTextLogLevel)
-            {
-                try
-                {
-
-                    App.sudokuManager.Logs.Add(currentObject.TextLog);
-                }
-                catch (Exception e)
-                {
-                    Console.WriteLine(e.Message);
-                }
-            }
-            
-        }
-
-
-
-        // Usually called when a transmission is complete. Not implemented.
-        public void OnCompleted()
-        {
-            throw new NotImplementedException();
-        }
-
-        // Usually called when there was an error. Didn't implement.
-        public void OnError(Exception error)
-        {
-            throw new NotImplementedException();
-        }
-        
-      /*  public void UpdateGridCase(string s, int i, int j) {
-            FrameworkElement elem = GridSudoku.Children.OfType<FrameworkElement>()
-                                    .FirstOrDefault(child => Grid.GetRow(child) == i && Grid.GetColumn(child) == j);
-            GridSudoku.Children.Remove(elem);
-            elem = CreateGridCase(s, i, j);
-            GridSudoku.Children.Add(elem);
-        }
-       * */
-
-
-
-
-
- 
-
-
     }
-
-
 }
