@@ -11,8 +11,7 @@ namespace Sudoku {
         private string delimiter;
         private int mode;
         public ObservableCollection<CellsGrid> modelList { get; set; }
-        public ObservableCollection<String> Logs { get; set; }
-
+        public ObservableCollection<string> logs { get; set; }
         public CellsGrid GridSelected { get; set; }
 
         /**
@@ -24,12 +23,8 @@ namespace Sudoku {
         public SudokuManager(string path, IObserver<SudokuObject> MainConsole, int mode = 0)
             : base() {
             this.Path = path;
-            Logs = new ObservableCollection<String>();
-            // Test for logs implementation
-            //Logs.Add("Blable");
-            //Logs.Add("fezfez fez fe");
-            //Logs.Add("dzad zad azdza");
             this.ModelList = new ObservableCollection<CellsGrid>();
+            this.Logs = new ObservableCollection<string>();
             this.Mode = mode;
 
             Subscribe(MainConsole);
@@ -60,6 +55,11 @@ namespace Sudoku {
         public int Mode {
             get { return this.mode; }
             set { this.mode = value; }
+        }
+
+        public ObservableCollection<string> Logs {
+            get { return this.logs; }
+            set { this.logs = value; }
         }
 
         private void verifyIntegrityOfAllSudoku() {
@@ -223,7 +223,6 @@ namespace Sudoku {
         }
 
         public void resolveSelected() {
-
             if (GridSelected.isValid) {
                 if (!GridSelected.isDone()) {
 

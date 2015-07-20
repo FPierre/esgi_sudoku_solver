@@ -67,7 +67,7 @@ namespace Sudoku
 
                     if (choiceSudokuu < 0)
                     {
-                        Console.WriteLine("Vous n'avez riens choisis");
+                        Console.WriteLine("Vous n'avez riens choisi");
                         return;
                     }
                     else
@@ -149,7 +149,7 @@ namespace Sudoku
             bool response = false;
             do
             {
-                Console.WriteLine("voullez vous faire du pas à pas ? oui/non");
+                Console.WriteLine("voulez vous faire du pas à pas ? oui/non");
 
                 string choice = Console.ReadLine();
                 switch (choice)

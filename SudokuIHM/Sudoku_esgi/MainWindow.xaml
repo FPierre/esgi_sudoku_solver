@@ -90,19 +90,9 @@
             </Grid.RowDefinitions>
 
             <!-- Logs -->
-            <ListBox Grid.Row="0" Grid.Column="0" Width="Auto" Margin="0,0,0,5"
-                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                     ItemsSource="{Binding Logs}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Padding="5,0,5,0"
-                                       HorizontalAlignment="Stretch" VerticalAlignment="Center"
-                                       FontSize="14" Text="{Binding Path=TextLog}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <ListBox Grid.Row="0" Grid.Column="0"
+                     Name="ListLogs" Width="Auto" Margin="0,0,0,5"
+                     ItemsSource="{Binding Path=logs}" SelectedItem="{Binding Path=TextLog}"/>
 
             <!-- Actions -->
             <StackPanel Grid.Row="1" Grid.Column="0"
@@ -123,7 +113,7 @@
                               Checked="StepByStepChecked" Unchecked="StepByStepUnchecked"/>
                     <Button Grid.Row="0" Grid.Column="1" Height="Auto" Padding="5"
 	                        HorizontalAlignment="Right" VerticalAlignment="Center"
-                            Name="ButtonActionStep" Content="Suivant" Click="GoNextStep"
+                            Name="ButtonActionStep" Content="Suivant" Click="TreatSudoku"
                             Style="{StaticResource RedButton}"
                             Visibility="Hidden"/>
                 </Grid>

@@ -22,7 +22,7 @@ namespace Sudoku_esgi {
         private int mode = 0;
         private bool stepByStep = false;
         public String file;
-        public  ModeText modeLog = ModeText.Warning;
+        public ModeText modeLog = ModeText.Warning;
 
         public MainWindow() {
             InitializeComponent();
@@ -50,16 +50,17 @@ namespace Sudoku_esgi {
 
         private void StepByStepUnchecked(object sender, RoutedEventArgs e) {
             ButtonActionStep.Visibility = Visibility.Hidden;
+            stepByStep = false;
         }
 
         private void StepByStepChecked(object sender, RoutedEventArgs e) {
             ButtonActionStep.Visibility = Visibility.Visible;
+            stepByStep = true;
         }
 
         private void SelectModeChanged(object sender, SelectionChangedEventArgs e) {
             ComboBoxItem selectedMode = (ComboBoxItem) SelectMode.SelectedItem;
             mode = SelectMode.SelectedIndex;
-            //App.SudokuManager = new SudokuManager(App.selectFile(), App.Console, SelectMode.SelectedIndex);
 
             if (ActionSudoku != null) {
                 ActionSudoku.Visibility = Visibility.Visible;
@@ -72,14 +73,17 @@ namespace Sudoku_esgi {
 
             } else if (App.sudokuManager.GridSelected != null && mode == 1) {
                this.modeLog = ModeText.Verbose;
+
+               //if (stepByStep)
+               //    ConsoleMenu.StepByStep = true;
+               //else
+               //    ConsoleMenu.StepByStep = false;
+
                Task task = new Task(new Action(App.sudokuManager.resolveSelected));
                task.Start();
+
             } else
                 MessageBox.Show("Tu dois d'abord sélectionner un sudoku.");
-        }
-
-        private void GoNextStep(object sender, RoutedEventArgs e) {
-            // Traitement step-by-step
         }
 
         private void SelectSudokuChanged(object sender, SelectionChangedEventArgs e) {
@@ -139,5 +143,21 @@ namespace Sudoku_esgi {
             Grid.SetColumn(elem, j);
             return elem;
         }
+
+        public void OnNext(SudokuObject currentObject) {
+            if (stepByStep)
+                Console.WriteLine("Current Object: " + currentObject.lastTextLogLevel + " - Log: " + currentObject.TextLog);
+            if (this.modeLog <= currentObject.lastTextLogLevel) {
+                try {
+                    App.sudokuManager.logs.Add(currentObject.TextLog);
+                } catch (Exception e) {
+                    Console.WriteLine(e.Message);
+                }
+            }
+        }
+        
+        public void OnCompleted() { throw new NotImplementedException(); }
+
+        public void OnError(Exception error) { throw new NotImplementedException(); }
     }
 }
