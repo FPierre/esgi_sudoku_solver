@@ -11,9 +11,9 @@ namespace Sudoku
     public class SudokuObject : INotifyPropertyChanged
     {
         protected List<IObserver<SudokuObject>> observers;
-        private String textLog_;
+        private string textLog_;
    
-       public  String TextLog
+       public string TextLog
         {
             get
             {

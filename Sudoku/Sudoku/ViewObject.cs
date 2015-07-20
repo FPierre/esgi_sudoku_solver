@@ -8,13 +8,11 @@ namespace Sudoku
 {
     public class ViewObject
     {
-
         public static bool StepByStep = false;
         public static ModeText mode = ModeText.Warning;
         protected StringBuilder result;
 
-        public ViewObject()
-        {
+        public ViewObject() {
             result = new StringBuilder();
         }
 

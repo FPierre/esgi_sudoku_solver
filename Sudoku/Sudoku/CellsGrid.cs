@@ -42,7 +42,11 @@ namespace Sudoku
             set;
         }
 
-        public String required;
+        public String required 
+        {
+            get;
+            set;
+        }
 
 
         public String error
@@ -155,20 +159,14 @@ namespace Sudoku
             // TODO: Complete member initialization
         }
 
-      
-
-
         public CellsGrid  resolveGrid(bool normalMode = true)
         {
-            
-
             do
             {
                 int oldNumberResolution = numberOfDots;
                 bool doSomething = false;
                 foreach(Cell c in grid)
                 {
-
                     if (c.Value.Equals(".") && c.hypothesis.Count == 1)
                     {
 
@@ -206,7 +204,6 @@ namespace Sudoku
 
                     if(c.Value.Equals(".") && c.hypothesis.Count == 0)
                     {
-
                         this.cantResolve = true;
                         return this;
                     }
@@ -215,11 +212,9 @@ namespace Sudoku
                 }
                 if (doSomething == false && oldNumberResolution == numberOfDots && this.cantResolve == false)
                 {
-
                     if (normalMode == true)
                     {
                         return this.ResolveBlockCells();
-                       
                     }
                     else
                     {
@@ -228,13 +223,12 @@ namespace Sudoku
                 }
             }
             while (!this.isDone() && this.cantResolve == false);
-           return this;
 
+           return this;
         }
 
         public Dictionary<string, List<Cell>> counBlockCells()
         {
-
             Dictionary<string, List<Cell>> listOccurenHypothesis = new Dictionary<String, List<Cell>>();
 
             foreach (var cell in this.grid)
@@ -264,7 +258,6 @@ namespace Sudoku
             return listOccurenHypothesis;
         }
 
-
         public List<KeyValuePair<string, List<Cell>>> sortedBlockCells(Dictionary<string, List<Cell>> dict)
         {
             List<KeyValuePair<string, List<Cell>>> myList = dict.ToList();
@@ -287,7 +280,6 @@ namespace Sudoku
 
         public List<Cell> getBlockCells(List<KeyValuePair<string, List<Cell>>> list)
         {
-
             bool doSomething = false;
             List<Cell> result = new List<Cell>();
 
@@ -325,11 +317,8 @@ namespace Sudoku
             return result;
         }
 
-
         private void deleteInListCells(List<Cell> cells, Cell cell, Cell nextCell)
         {
-
-
             cells = cells.FindAll(Mycell => !Mycell.EqualsInValueAndHypothesis(cell) && !Mycell.EqualsInValueAndHypothesis(nextCell));
             foreach (String hypothesisString in cell.hypothesis)
             {
@@ -342,8 +331,6 @@ namespace Sudoku
 
         private void deleteAllHypothesisFromEnsembleInCell(List<Cell> blockCells, Cell c)
         {
-
-
             for (int i = 0; i < blockCells.Count - 1; i++)
             {
                 Log(ModeText.Verbose, String.Format("Delete hypothesis {0}", blockCells[i].hypothesis.Aggregate((stringa, stringb) => stringa + stringb)));
@@ -367,12 +354,8 @@ namespace Sudoku
             }
         }
 
-
-
-
         public CellsGrid ResolveBlockCells()
         {
-        
             List<CellsGrid> testList = new List<CellsGrid>();
             testList.Add(new CellsGrid(this));
             
@@ -383,7 +366,6 @@ namespace Sudoku
 
             List<Cell> blockCells = this.getBlockCells(sortedCells);
 
-
             Log(ModeText.Verbose, "cellule bloquante");
             foreach (Cell c in blockCells)
             {
@@ -392,6 +374,7 @@ namespace Sudoku
 
                 // Console.ReadLine();
             }
+
             if (blockCells.Count == 0)
             {
                 if (listHypotheticSudoku.Any(Listgrid => this.EqualsInCell(Listgrid)))
@@ -426,7 +409,6 @@ namespace Sudoku
             {
                 for (int i = 0; i < blockCells.Count; i++)
                 {
-
                     var cell = blockCells[i];
                     List<String> temp = new List<String>(cell.hypothesis);
                     testList.Last().cantResolve = false;
@@ -436,14 +418,11 @@ namespace Sudoku
 
                     if (testList.Last().isDone())
                     {
-
                         return this;
                     }
 
-
                     foreach (String Hypothesis in temp)
                     {
-
                         testHypothesis(Hypothesis,testList ,cell);
                         if (this.isDone())
                         {
@@ -452,11 +431,11 @@ namespace Sudoku
                     }
 
                     this.cantResolve = true;
-
                     testList.Remove(testList.Last());
                 }
             }
             this.cantResolve = true;
+
             return this;
         }
 
@@ -473,7 +452,6 @@ namespace Sudoku
             //Console.Out.WriteLine(testList.Last());
             this.resolveGrid();
 
-
             if (this.cantResolve == true)
             {
                 CellsGrid saveGrid = testList.Last();
@@ -483,22 +461,16 @@ namespace Sudoku
                     this.grid[saveCell.PosX, saveCell.PosY].Value = saveCell.Value;
                     this.grid[saveCell.PosX, saveCell.PosY].hypothesis.Clear();
                     this.grid[saveCell.PosX, saveCell.PosY].hypothesis.AddRange(saveCell.hypothesis);
-                  
-                    
                 }
 
                 testList.Last().cantResolve = true;
-
                 Log(ModeText.Verbose, "RollBack");
 
             }
         }
 
-
         public void verifyAppearance()
         {
-            
-
             for (int i = 0; i < this.size; i++)
             {
                 for (int j = 0; j < this.size; j++)
@@ -511,7 +483,6 @@ namespace Sudoku
                     }
                     else
                     {
-                        
                         error = String.Format("grille : {3} {4}la cellule à l'index {0},{1} a une valeur semblable dans sa ligne, dans sa colonne ou dans son secteur", i, j,this.name,Environment.NewLine);
 
                         this.Log(ModeText.Error, error);
@@ -520,12 +491,8 @@ namespace Sudoku
                         break;
                     }
                 }
-
             }
         }
-
-
-        
 
         public bool isDone()
         {
@@ -539,7 +506,6 @@ namespace Sudoku
 
             return true;
         }
-
 
         public override string ToString()
         {
@@ -563,8 +529,6 @@ namespace Sudoku
             text.Append(Environment.NewLine);
             return text.ToString();
         }
-
-
 
         public Cell Find(Cell cell , int pos)
         {
@@ -597,12 +561,10 @@ namespace Sudoku
             return false;
         }
 
-
         public  bool EqualsInCell(object obj)
         {
             if (obj is CellsGrid)
             {
-                
                 CellsGrid compareGrid = obj as CellsGrid;
                 if(compareGrid.size != this.size)
                     return false;

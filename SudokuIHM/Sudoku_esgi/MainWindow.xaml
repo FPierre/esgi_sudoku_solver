@@ -90,21 +90,14 @@
             </Grid.RowDefinitions>
 
             <!-- Logs -->
-            <ListBox Grid.Row="0" Grid.Column="0" Width="Auto" Margin="0,0,0,5"
-                     HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
-                     ItemsSource="{Binding Logs}">
-                <ListBox.ItemTemplate>
-                    <DataTemplate>
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Padding="5,0,5,0" Text="{Binding Path=TextLog}" />
-                        </StackPanel>
-                    </DataTemplate>
-                </ListBox.ItemTemplate>
-            </ListBox>
+            <ListBox Grid.Row="0" Grid.Column="0"
+                     Name="ListLogs" Width="Auto" Margin="0,0,0,5"
+                     ItemsSource="{Binding Path=logs}" SelectedItem="{Binding Path=TextLog}"/>
 
             <!-- Actions -->
             <StackPanel Grid.Row="1" Grid.Column="0"
-                        HorizontalAlignment="Stretch" VerticalAlignment="Bottom" >
+                        HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
+                        Name="ActionSudoku" Visibility="Hidden" >
                 <Grid Margin="0,5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*"/>
@@ -120,14 +113,14 @@
                               Checked="StepByStepChecked" Unchecked="StepByStepUnchecked"/>
                     <Button Grid.Row="0" Grid.Column="1" Height="Auto" Padding="5"
 	                        HorizontalAlignment="Right" VerticalAlignment="Center"
-                            Name="ActionStep" Content="Suivant" Click="GoNextStep"
+                            Name="ButtonActionStep" Content="Suivant" Click="TreatSudoku"
+                            Style="{StaticResource RedButton}"
                             Visibility="Hidden"/>
                 </Grid>
                 <Button Width="Auto" Height="Auto"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
-                        Name="ActionSudoku"
-                        Click="TreatSudoku" Style="{StaticResource RedButton}"
-                        Visibility="Hidden"/>
+                        Name="ButtonActionMode" Style="{StaticResource RedButton}"
+                        Click="TreatSudoku"/>
             </StackPanel>
         </Grid>
     </Grid>
