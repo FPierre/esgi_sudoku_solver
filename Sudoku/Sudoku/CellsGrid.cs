@@ -5,7 +5,7 @@ using System.Linq;
 
 namespace Sudoku
 {
-    public class CellsGrid : SudokuObject, IObservable<SudokuObject> ,
+    public class CellsGrid : SudokuObject, IObservable<SudokuObject> , IObserver<SudokuObject>
 	{
        // private static string gridDelimiter = @"//---------------------------";
 
@@ -71,6 +71,8 @@ namespace Sudoku
             get;
             set;
         }
+
+        public StringBuilder logsCellsGrid {get ; set ;}
 
         Resolver GridRecursiveResolver;
         public List<CellsGrid> listHypotheticSudoku;
@@ -149,6 +151,7 @@ namespace Sudoku
             {
                 this.observers.Add(observer);
             }
+            this.observers.Add(this);
             // TODO: Complete member initialization
         }
 
@@ -613,6 +616,27 @@ namespace Sudoku
                 return true;
             }
             return false;
+        }
+
+
+        // The observable invokes this method to pass the Subject object to the observer
+        public void OnNext(SudokuObject currentObject)
+        {
+            logsCellsGrid.Append(currentObject.lastTextLogLevel);
+        }
+
+
+
+        // Usually called when a transmission is complete. Not implemented.
+        public void OnCompleted()
+        {
+            throw new NotImplementedException();
+        }
+
+        // Usually called when there was an error. Didn't implement.
+        public void OnError(Exception error)
+        {
+            throw new NotImplementedException();
         }
 
 
