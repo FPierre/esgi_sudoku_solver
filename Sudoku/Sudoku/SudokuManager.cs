@@ -4,15 +4,26 @@ using System.Collections.ObjectModel;
 using System.Linq;
 using System.IO;
 using System.Text;
+using System.ComponentModel;
 
 namespace Sudoku {
-    public class SudokuManager : SudokuObject, IObservable<SudokuObject> {
+    public class SudokuManager : SudokuObject, IObservable<SudokuObject>, INotifyPropertyChanged {
         private string path;
         private string delimiter;
         private int mode;
         public ObservableCollection<CellsGrid> modelList { get; set; }
         public ObservableCollection<string> logs { get; set; }
-        public CellsGrid GridSelected { get; set; }
+        public CellsGrid _gridSelected;
+        public CellsGrid GridSelected { 
+            get{
+               return  this._gridSelected;
+                
+            }
+            set{
+                this._gridSelected = value;
+                NotifyPropertyChanged("GridSelected");    
+            }
+        }
 
         /**
          * Constructeur
@@ -267,6 +278,17 @@ namespace Sudoku {
                 this.Log(ModeText.Verbose, text);
                 this.Log(ModeText.Verbose, modelList[choiceSudokuu].error);
 
+            }
+        }
+
+        
+
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        private void NotifyPropertyChanged(string p) {
+            if (PropertyChanged != null) {
+                PropertyChanged(this, new PropertyChangedEventArgs(p));
             }
         }
     }

@@ -52,6 +52,7 @@
 
         <!-- Titre et infos -->
         <StackPanel Grid.Row="0" Grid.Column="0">
+            
             <TextBlock Name="NameSudoku" Text="{Binding GridSelected.name}"
                         Margin="5,5,5,0" FontWeight="Bold" FontSize="16"/>
             <TextBlock Name="DateSudoku" Text="{Binding GridSelected.date}" 
@@ -62,12 +63,6 @@
 
         <!-- Sélection des sudokus -->
         <StackPanel Grid.Row="0" Grid.Column="1" VerticalAlignment="Top">
-            <ComboBox Name="SelectMode" Margin="5"
-                        IsEditable="True" IsReadOnly="True" Text="Sélectionne un mode"
-                        SelectionChanged="SelectModeChanged">
-                <ComboBoxItem Content="Validation" Name="Validation"/>
-                <ComboBoxItem Content="Résolution" Name="Résolution"/>
-            </ComboBox>
             <ComboBox Name="SelectSudoku" Margin="5"
                         IsEditable="True" IsReadOnly="True" Text="Sélectionne un sudoku"
                         ItemsSource="{Binding Path=modelList}" SelectedItem="{Binding Path=GridSelected}"
@@ -97,7 +92,7 @@
             <!-- Actions -->
             <StackPanel Grid.Row="1" Grid.Column="0"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
-                        Name="ActionSudoku" Visibility="Hidden" >
+                        Name="ActionSudoku">
                 <Grid Margin="0,5">
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="2*"/>
@@ -109,18 +104,18 @@
 
                     <CheckBox Grid.Row="0" Grid.Column="0" Height="Auto"
                               HorizontalAlignment="Left" VerticalAlignment="Center"
-                              Content="Faire étape par étape"
-                              Checked="StepByStepChecked" Unchecked="StepByStepUnchecked"/>
-                    <Button Grid.Row="0" Grid.Column="1" Height="Auto" Padding="5"
+                              Content="Résolution en mutli-threading"
+                              Checked="AsyncChecked" Unchecked="AsyncUnchecked"/>
+                    <!--Button Grid.Row="0" Grid.Column="1" Height="Auto" Padding="5"
 	                        HorizontalAlignment="Right" VerticalAlignment="Center"
                             Name="ButtonActionStep" Content="Suivant" Click="TreatSudoku"
                             Style="{StaticResource RedButton}"
-                            Visibility="Hidden"/>
+                            Visibility="Hidden"/-->
                 </Grid>
                 <Button Width="Auto" Height="Auto"
                         HorizontalAlignment="Stretch" VerticalAlignment="Bottom"
                         Name="ButtonActionMode" Style="{StaticResource RedButton}"
-                        Click="TreatSudoku"/>
+                        Click="TreatSudoku" Content="Résolution"/>
             </StackPanel>
         </Grid>
     </Grid>

@@ -1,11 +1,14 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Text;
 using System.Linq;
+using System.Collections;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
 
 namespace Sudoku
 {
-    public class CellsGrid : SudokuObject, IObservable<SudokuObject> , IObserver<SudokuObject>
+    public class CellsGrid : SudokuObject, IObservable<SudokuObject> , IObserver<SudokuObject>, INotifyPropertyChanged
 	{
        // private static string gridDelimiter = @"//---------------------------";
 
@@ -76,7 +79,7 @@ namespace Sudoku
             set;
         }
 
-        public StringBuilder logsCellsGrid {get ; set ;}
+        public ObservableCollection<string> logsCellsGrid {get ; set ;}
 
         Resolver GridRecursiveResolver;
         public List<CellsGrid> listHypotheticSudoku;
@@ -157,6 +160,7 @@ namespace Sudoku
             }
             this.observers.Add(this);
             // TODO: Complete member initialization
+            logsCellsGrid = new ObservableCollection<string>();
         }
 
         public CellsGrid  resolveGrid(bool normalMode = true)
@@ -173,6 +177,7 @@ namespace Sudoku
                         c.Value = c.hypothesis.First();
                         this.Log(ModeText.Verbose, String.Format("Inject {0} at [{1},{2}]",c.Value, c.PosX ,c.PosY));
                         //this.Log(ModeText.Verbose, String.Format("Diffuse in all Ensemble the value",c.Value, c.PosX ,c.PosY));
+                        NotifyPropertyChanged("TextLog");
 
                         c.diffuseInItsEnsemble();
                         doSomething = true;
@@ -191,6 +196,7 @@ namespace Sudoku
                                 if ( (( !c.listColumn.ExistsInEnsembleHypothesis(hypothesis, c)  || !c.listLine.ExistsInEnsembleHypothesis(hypothesis, c)) ||  !c.listSector.ExistsInEnsembleHypothesis(hypothesis, c)))
                                 {
                                     this.Log(ModeText.Verbose, String.Format("exclusions des hypothéses"));
+                                    NotifyPropertyChanged("TextLog");
                                     c.Value = hypothesis;
                                     c.diffuseInItsEnsemble();
                                     doSomething = true;
@@ -486,6 +492,7 @@ namespace Sudoku
                         error = String.Format("grille : {3} {4}la cellule à l'index {0},{1} a une valeur semblable dans sa ligne, dans sa colonne ou dans son secteur", i, j,this.name,Environment.NewLine);
 
                         this.Log(ModeText.Error, error);
+                        NotifyPropertyChanged("TextLog");
 
                         this.isValid = false;
                         break;
@@ -584,7 +591,7 @@ namespace Sudoku
         // The observable invokes this method to pass the Subject object to the observer
         public void OnNext(SudokuObject currentObject)
         {
-            logsCellsGrid.Append(currentObject.lastTextLogLevel);
+            logsCellsGrid.Add(currentObject.TextLog);
         }
 
 
@@ -601,7 +608,12 @@ namespace Sudoku
             throw new NotImplementedException();
         }
 
-
+        public event PropertyChangedEventHandler PropertyChanged;
+        private void NotifyPropertyChanged(string p) {
+            if (PropertyChanged != null) {
+                PropertyChanged(this, new PropertyChangedEventArgs(p));
+            }
+        }
 
 	}
 }

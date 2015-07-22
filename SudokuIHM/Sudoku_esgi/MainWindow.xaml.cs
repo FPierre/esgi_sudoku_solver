@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Threading;
 using System.Windows.Controls;
 using System.Windows.Data;
 using System.Windows.Documents;
@@ -19,8 +20,7 @@ namespace Sudoku_esgi {
 
     public partial class MainWindow : Window, IObserver<SudokuObject> {
 
-        private int mode = 0;
-        private bool stepByStep = false;
+        private bool threadingMode = false;
         public String file;
         public ModeText modeLog = ModeText.Warning;
 
@@ -48,39 +48,27 @@ namespace Sudoku_esgi {
             return false;
         }
 
-        private void StepByStepUnchecked(object sender, RoutedEventArgs e) {
-            ButtonActionStep.Visibility = Visibility.Hidden;
-            stepByStep = false;
+        private void AsyncUnchecked(object sender, RoutedEventArgs e) {
+            threadingMode = false;
         }
 
-        private void StepByStepChecked(object sender, RoutedEventArgs e) {
-            ButtonActionStep.Visibility = Visibility.Visible;
-            stepByStep = true;
-        }
-
-        private void SelectModeChanged(object sender, SelectionChangedEventArgs e) {
-            ComboBoxItem selectedMode = (ComboBoxItem) SelectMode.SelectedItem;
-            mode = SelectMode.SelectedIndex;
-
-            if (ActionSudoku != null) {
-                ActionSudoku.Visibility = Visibility.Visible;
-                ButtonActionMode.Content = selectedMode.Content.ToString();
-            }
+        private void AsyncChecked(object sender, RoutedEventArgs e) {
+            threadingMode = true;
         }
 
         private void TreatSudoku(object sender, RoutedEventArgs e) {
-            if (mode == 0) {
+            if (App.sudokuManager.GridSelected != null) {
+                this.modeLog = ModeText.Verbose;
 
-            } else if (App.sudokuManager.GridSelected != null && mode == 1) {
-               this.modeLog = ModeText.Verbose;
-
-               //if (stepByStep)
-               //    ConsoleMenu.StepByStep = true;
-               //else
-               //    ConsoleMenu.StepByStep = false;
-
-               Task task = new Task(new Action(App.sudokuManager.resolveSelected));
-               task.Start();
+               if (threadingMode) {
+                   ListLogs.DataContext = App.sudokuManager.GridSelected;
+                   Task task = new Task(new Action(App.sudokuManager.resolveSelected));
+                   task.Start();
+               } else {
+                   Application.Current.Dispatcher.BeginInvoke(DispatcherPriority.Normal,
+                       new Action(() => { App.sudokuManager.resolveSelected(); })
+                   );
+               }
 
             } else
                 MessageBox.Show("Tu dois d'abord sélectionner un sudoku.");
@@ -145,8 +133,6 @@ namespace Sudoku_esgi {
         }
 
         public void OnNext(SudokuObject currentObject) {
-            if (stepByStep)
-                Console.WriteLine("Current Object: " + currentObject.lastTextLogLevel + " - Log: " + currentObject.TextLog);
             if (this.modeLog <= currentObject.lastTextLogLevel) {
                 try {
                     App.sudokuManager.logs.Add(currentObject.TextLog);
